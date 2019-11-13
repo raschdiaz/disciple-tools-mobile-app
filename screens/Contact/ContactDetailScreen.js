@@ -397,6 +397,21 @@ class ContactDetailScreen extends React.Component {
             comment: prevState.contact.initial_comment,
           };
         }
+        if (newState.contact.location_grid) {
+          newState.contact.location_grid.values.forEach((location) => {
+            const foundLocation = newState.geonames.find(geoname => geoname.value === location.value);
+            if (!foundLocation) {
+              // Add non existent contact location in the geonames list to avoid null exception
+              newState = {
+                ...newState,
+                geonames: [...newState.geonames, {
+                  name: location.name,
+                  value: location.value,
+                }],
+              };
+            }
+          });
+        }
       }
     }
 
