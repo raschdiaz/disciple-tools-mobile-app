@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
   // Form
   formContainer: {
     paddingTop: 10,
-    paddingBottom: 10,
+    paddingBottom: 120,
     paddingLeft: containerPadding,
     paddingRight: containerPadding,
   },
@@ -2386,7 +2386,7 @@ class GroupDetailScreen extends React.Component {
           toastSuccess = toast;
         }}
         style={{ backgroundColor: 'green' }}
-        position="center"
+        positionValue={180}
       />
     );
     const errorToast = (
@@ -2395,7 +2395,7 @@ class GroupDetailScreen extends React.Component {
           toastError = toast;
         }}
         style={{ backgroundColor: Colors.errorBackground }}
-        position="center"
+        positionValue={180}
       />
     );
 
