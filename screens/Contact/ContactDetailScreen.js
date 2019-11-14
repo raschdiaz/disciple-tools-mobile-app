@@ -397,6 +397,21 @@ class ContactDetailScreen extends React.Component {
             comment: prevState.contact.initial_comment,
           };
         }
+        if (newState.contact.location_grid) {
+          newState.contact.location_grid.values.forEach((location) => {
+            const foundLocation = newState.geonames.find(geoname => geoname.value === location.value);
+            if (!foundLocation) {
+              // Add non existent contact location in the geonames list to avoid null exception
+              newState = {
+                ...newState,
+                geonames: [...newState.geonames, {
+                  name: location.name,
+                  value: location.value,
+                }],
+              };
+            }
+          });
+        }
       }
     }
 
@@ -949,8 +964,8 @@ class ContactDetailScreen extends React.Component {
                 color: '#ffffff',
                 backgroundColor: this.state.overallStatusBackgroundColor,
               } : {
-                backgroundColor: this.state.overallStatusBackgroundColor,
-              }}
+                  backgroundColor: this.state.overallStatusBackgroundColor,
+                }}
             >
               {this.renderStatusPickerItems()}
             </Picker>
@@ -1674,36 +1689,36 @@ class ContactDetailScreen extends React.Component {
             commentOrActivity,
             'content',
           ) && (
-          <Grid>
-            <Row>
-              <Col>
-                <Text style={styles.name}>{commentOrActivity.author}</Text>
-              </Col>
-              <Col style={{ width: 110 }}>
-                <Text style={styles.time}>
-                  {this.onFormatDateToView(commentOrActivity.date)}
-                </Text>
-              </Col>
-            </Row>
-          </Grid>
-          )}
+              <Grid>
+                <Row>
+                  <Col>
+                    <Text style={styles.name}>{commentOrActivity.author}</Text>
+                  </Col>
+                  <Col style={{ width: 110 }}>
+                    <Text style={styles.time}>
+                      {this.onFormatDateToView(commentOrActivity.date)}
+                    </Text>
+                  </Col>
+                </Row>
+              </Grid>
+            )}
           {Object.prototype.hasOwnProperty.call(
             commentOrActivity,
             'object_note',
           ) && (
-          <Grid>
-            <Row>
-              <Col>
-                <Text style={styles.name}>{commentOrActivity.name}</Text>
-              </Col>
-              <Col style={{ width: 110 }}>
-                <Text style={styles.time}>
-                  {this.onFormatDateToView(commentOrActivity.date)}
-                </Text>
-              </Col>
-            </Row>
-          </Grid>
-          )}
+              <Grid>
+                <Row>
+                  <Col>
+                    <Text style={styles.name}>{commentOrActivity.name}</Text>
+                  </Col>
+                  <Col style={{ width: 110 }}>
+                    <Text style={styles.time}>
+                      {this.onFormatDateToView(commentOrActivity.date)}
+                    </Text>
+                  </Col>
+                </Row>
+              </Grid>
+            )}
         </View>
         <Text
           style={
@@ -2661,12 +2676,12 @@ class ContactDetailScreen extends React.Component {
                             style={{ color: 'white', fontSize: 22 }}
                           />
                         ) : (
-                          <Icon
-                            type="MaterialCommunityIcons"
-                            name="comment-plus"
-                            style={{ color: 'white', fontSize: 25 }}
-                          />
-                        ))
+                            <Icon
+                              type="MaterialCommunityIcons"
+                              name="comment-plus"
+                              style={{ color: 'white', fontSize: 25 }}
+                            />
+                          ))
                         }
                         degrees={0}
                         activeOpacity={0}
@@ -2701,10 +2716,10 @@ class ContactDetailScreen extends React.Component {
                               this.state.contact,
                               'quick_button_contact_established',
                             ) ? parseInt(
-                                this.state.contact
-                                  .quick_button_contact_established,
-                                10,
-                              ) + 1 : 1,
+                              this.state.contact
+                                .quick_button_contact_established,
+                              10,
+                            ) + 1 : 1,
                           })}
                           size={40}
                           nativeFeedbackRippleColor="rgba(0,0,0,0)"
@@ -2725,10 +2740,10 @@ class ContactDetailScreen extends React.Component {
                               this.state.contact,
                               'quick_button_meeting_scheduled',
                             ) ? parseInt(
-                                this.state.contact
-                                  .quick_button_meeting_scheduled,
-                                10,
-                              ) + 1 : 1,
+                              this.state.contact
+                                .quick_button_meeting_scheduled,
+                              10,
+                            ) + 1 : 1,
                           })
                           }
                           size={40}
@@ -2750,10 +2765,10 @@ class ContactDetailScreen extends React.Component {
                               this.state.contact,
                               'quick_button_meeting_complete',
                             ) ? parseInt(
-                                this.state.contact
-                                  .quick_button_meeting_complete,
-                                10,
-                              ) + 1 : 1,
+                              this.state.contact
+                                .quick_button_meeting_complete,
+                              10,
+                            ) + 1 : 1,
                           })
                           }
                           size={40}
@@ -2775,10 +2790,10 @@ class ContactDetailScreen extends React.Component {
                               this.state.contact,
                               'quick_button_no_show',
                             ) ? parseInt(
-                                this.state.contact
-                                  .quick_button_no_show,
-                                10,
-                              ) + 1 : 1,
+                              this.state.contact
+                                .quick_button_no_show,
+                              10,
+                            ) + 1 : 1,
                           })
                           }
                           size={40}
@@ -2822,8 +2837,8 @@ class ContactDetailScreen extends React.Component {
                                         color: '#ffffff',
                                         backgroundColor: this.state.overallStatusBackgroundColor,
                                       } : {
-                                        backgroundColor: this.state.overallStatusBackgroundColor,
-                                      }}
+                                          backgroundColor: this.state.overallStatusBackgroundColor,
+                                        }}
                                     >
                                       {this.renderStatusPickerItems()}
                                     </Picker>
@@ -4255,193 +4270,193 @@ class ContactDetailScreen extends React.Component {
                 )}
               </View>
             ) : (
-              <KeyboardShift>
-                {() => (
-                  <ScrollView keyboardShouldPersistTaps="handled">
-                    <View style={styles.formContainer}>
-                      <Grid>
-                        <Row>
-                          <Label
-                            style={[
-                              styles.formLabel,
-                              { marginTop: 10, marginBottom: 5 },
-                            ]}
-                          >
-                            {i18n.t('contactDetailScreen.fullName')}
-                          </Label>
-                        </Row>
-                        <Row>
-                          <Input
-                            placeholder={i18n.t('global.requiredField')}
-                            onChangeText={this.setContactTitle}
-                            style={{
-                              borderColor: '#B4B4B4',
-                              borderWidth: 1,
-                              borderRadius: 5,
-                              borderStyle: 'solid',
-                              fontSize: 13,
-                              paddingLeft: 15,
-                            }}
-                          />
-                        </Row>
-                        <Row>
-                          <Label
-                            style={[
-                              styles.formLabel,
-                              { marginTop: 10, marginBottom: 5 },
-                            ]}
-                          >
-                            {i18n.t('contactDetailScreen.phoneNumber')}
-                          </Label>
-                        </Row>
-                        <Row>
-                          <Input
-                            onChangeText={this.setSingleContactPhone}
-                            style={{
-                              borderColor: '#B4B4B4',
-                              borderWidth: 1,
-                              borderRadius: 5,
-                              borderStyle: 'solid',
-                              fontSize: 13,
-                              paddingLeft: 15,
-                            }}
-                          />
-                        </Row>
-                        <Row>
-                          <Label
-                            style={[
-                              styles.formLabel,
-                              { marginTop: 10, marginBottom: 5 },
-                            ]}
-                          >
-                            {i18n.t('contactDetailScreen.email')}
-                          </Label>
-                        </Row>
-                        <Row>
-                          <Input
-                            onChangeText={this.setContactEmail}
-                            style={{
-                              borderColor: '#B4B4B4',
-                              borderWidth: 1,
-                              borderRadius: 5,
-                              borderStyle: 'solid',
-                              fontSize: 13,
-                              paddingLeft: 15,
-                            }}
-                          />
-                        </Row>
-                        <Row>
-                          <Label
-                            style={[
-                              styles.formLabel,
-                              { marginTop: 10, marginBottom: 5 },
-                            ]}
-                          >
-                            {this.props.contactSettings.fields.sources.name}
-                          </Label>
-                        </Row>
-                        <Row>
-                          <Picker
-                            onValueChange={this.setContactSource}
-                            selectedValue={this.state.contact.sources.values[0].value}
-                          >
-                            {this.renderSourcePickerItems()}
-                          </Picker>
-                        </Row>
-                        <Row>
-                          <Label
-                            style={[
-                              styles.formLabel,
-                              { marginTop: 10, marginBottom: 5 },
-                            ]}
-                          >
-                            {this.props.contactSettings.fields.location_grid.name}
-                          </Label>
-                        </Row>
-                        <Row>
-                          <Col style={{ paddingLeft: 10, paddingRight: 10 }}>
-                            <Selectize
-                              ref={(selectize) => { geonamesSelectizeRef = selectize; }}
-                              itemId="value"
-                              items={this.state.geonames}
-                              selectedItems={[]}
-                              textInputProps={{
-                                placeholder: i18n.t('contactDetailScreen.selectLocations'),
+                <KeyboardShift>
+                  {() => (
+                    <ScrollView keyboardShouldPersistTaps="handled">
+                      <View style={styles.formContainer}>
+                        <Grid>
+                          <Row>
+                            <Label
+                              style={[
+                                styles.formLabel,
+                                { marginTop: 10, marginBottom: 5 },
+                              ]}
+                            >
+                              {i18n.t('contactDetailScreen.fullName')}
+                            </Label>
+                          </Row>
+                          <Row>
+                            <Input
+                              placeholder={i18n.t('global.requiredField')}
+                              onChangeText={this.setContactTitle}
+                              style={{
+                                borderColor: '#B4B4B4',
+                                borderWidth: 1,
+                                borderRadius: 5,
+                                borderStyle: 'solid',
+                                fontSize: 13,
+                                paddingLeft: 15,
                               }}
-                              renderRow={(id, onPress, item) => (
-                                <TouchableOpacity
-                                  activeOpacity={0.6}
-                                  key={id}
-                                  onPress={onPress}
-                                  style={{
-                                    paddingVertical: 8,
-                                    paddingHorizontal: 10,
-                                  }}
-                                >
-                                  <View
+                            />
+                          </Row>
+                          <Row>
+                            <Label
+                              style={[
+                                styles.formLabel,
+                                { marginTop: 10, marginBottom: 5 },
+                              ]}
+                            >
+                              {i18n.t('contactDetailScreen.phoneNumber')}
+                            </Label>
+                          </Row>
+                          <Row>
+                            <Input
+                              onChangeText={this.setSingleContactPhone}
+                              style={{
+                                borderColor: '#B4B4B4',
+                                borderWidth: 1,
+                                borderRadius: 5,
+                                borderStyle: 'solid',
+                                fontSize: 13,
+                                paddingLeft: 15,
+                              }}
+                            />
+                          </Row>
+                          <Row>
+                            <Label
+                              style={[
+                                styles.formLabel,
+                                { marginTop: 10, marginBottom: 5 },
+                              ]}
+                            >
+                              {i18n.t('contactDetailScreen.email')}
+                            </Label>
+                          </Row>
+                          <Row>
+                            <Input
+                              onChangeText={this.setContactEmail}
+                              style={{
+                                borderColor: '#B4B4B4',
+                                borderWidth: 1,
+                                borderRadius: 5,
+                                borderStyle: 'solid',
+                                fontSize: 13,
+                                paddingLeft: 15,
+                              }}
+                            />
+                          </Row>
+                          <Row>
+                            <Label
+                              style={[
+                                styles.formLabel,
+                                { marginTop: 10, marginBottom: 5 },
+                              ]}
+                            >
+                              {this.props.contactSettings.fields.sources.name}
+                            </Label>
+                          </Row>
+                          <Row>
+                            <Picker
+                              onValueChange={this.setContactSource}
+                              selectedValue={this.state.contact.sources.values[0].value}
+                            >
+                              {this.renderSourcePickerItems()}
+                            </Picker>
+                          </Row>
+                          <Row>
+                            <Label
+                              style={[
+                                styles.formLabel,
+                                { marginTop: 10, marginBottom: 5 },
+                              ]}
+                            >
+                              {this.props.contactSettings.fields.location_grid.name}
+                            </Label>
+                          </Row>
+                          <Row>
+                            <Col style={{ paddingLeft: 10, paddingRight: 10 }}>
+                              <Selectize
+                                ref={(selectize) => { geonamesSelectizeRef = selectize; }}
+                                itemId="value"
+                                items={this.state.geonames}
+                                selectedItems={[]}
+                                textInputProps={{
+                                  placeholder: i18n.t('contactDetailScreen.selectLocations'),
+                                }}
+                                renderRow={(id, onPress, item) => (
+                                  <TouchableOpacity
+                                    activeOpacity={0.6}
+                                    key={id}
+                                    onPress={onPress}
                                     style={{
-                                      flexDirection: 'row',
+                                      paddingVertical: 8,
+                                      paddingHorizontal: 10,
                                     }}
                                   >
-                                    <Text style={{
-                                      color: 'rgba(0, 0, 0, 0.87)',
-                                      fontSize: 14,
-                                      lineHeight: 21,
-                                    }}
+                                    <View
+                                      style={{
+                                        flexDirection: 'row',
+                                      }}
                                     >
-                                      {item.name}
-                                    </Text>
-                                  </View>
-                                </TouchableOpacity>
-                              )}
-                              renderChip={(id, onClose, item, style, iconStyle) => (
-                                <Chip
-                                  key={id}
-                                  iconStyle={iconStyle}
-                                  onClose={onClose}
-                                  text={item.name}
-                                  style={style}
-                                />
-                              )}
-                              filterOnKey="name"
-                              keyboardShouldPersistTaps
-                              inputContainerStyle={{ borderWidth: 1, borderColor: '#CCCCCC', padding: 5 }}
+                                      <Text style={{
+                                        color: 'rgba(0, 0, 0, 0.87)',
+                                        fontSize: 14,
+                                        lineHeight: 21,
+                                      }}
+                                      >
+                                        {item.name}
+                                      </Text>
+                                    </View>
+                                  </TouchableOpacity>
+                                )}
+                                renderChip={(id, onClose, item, style, iconStyle) => (
+                                  <Chip
+                                    key={id}
+                                    iconStyle={iconStyle}
+                                    onClose={onClose}
+                                    text={item.name}
+                                    style={style}
+                                  />
+                                )}
+                                filterOnKey="name"
+                                keyboardShouldPersistTaps
+                                inputContainerStyle={{ borderWidth: 1, borderColor: '#CCCCCC', padding: 5 }}
+                              />
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Label
+                              style={[
+                                styles.formLabel,
+                                { marginTop: 10, marginBottom: 5 },
+                              ]}
+                            >
+                              {i18n.t('contactDetailScreen.initialComment')}
+                            </Label>
+                          </Row>
+                          <Row>
+                            <Input
+                              multiline
+                              onChangeText={this.setContactInitialComment}
+                              style={{
+                                borderColor: '#B4B4B4',
+                                borderWidth: 1,
+                                borderRadius: 5,
+                                borderStyle: 'solid',
+                                fontSize: 13,
+                                paddingLeft: 15,
+                              }}
                             />
-                          </Col>
-                        </Row>
-                        <Row>
-                          <Label
-                            style={[
-                              styles.formLabel,
-                              { marginTop: 10, marginBottom: 5 },
-                            ]}
-                          >
-                            {i18n.t('contactDetailScreen.initialComment')}
-                          </Label>
-                        </Row>
-                        <Row>
-                          <Input
-                            multiline
-                            onChangeText={this.setContactInitialComment}
-                            style={{
-                              borderColor: '#B4B4B4',
-                              borderWidth: 1,
-                              borderRadius: 5,
-                              borderStyle: 'solid',
-                              fontSize: 13,
-                              paddingLeft: 15,
-                            }}
-                          />
-                        </Row>
-                      </Grid>
-                      <Button block style={styles.saveButton} onPress={this.onSaveContact}>
-                        <Text style={{ color: '#FFFFFF', fontWeight: 'bold' }}>{i18n.t('global.save')}</Text>
-                      </Button>
-                    </View>
-                  </ScrollView>
-                )}
-              </KeyboardShift>
-            )}
+                          </Row>
+                        </Grid>
+                        <Button block style={styles.saveButton} onPress={this.onSaveContact}>
+                          <Text style={{ color: '#FFFFFF', fontWeight: 'bold' }}>{i18n.t('global.save')}</Text>
+                        </Button>
+                      </View>
+                    </ScrollView>
+                  )}
+                </KeyboardShift>
+              )}
           </View>
         )}
         {successToast}
