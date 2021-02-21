@@ -1768,9 +1768,13 @@ class ContactDetailScreen extends React.Component {
             };
           }
           if (contactToSave.assigned_to) {
+            // TODO: this is a (hopefully temprorary workaround)
+            // ref: 'setContactCustomFieldValue' method AND "case 'user_select':" Ln#4273
+            const assignedTo = contactToSave.assigned_to;
+            const assignedToID = assignedTo.hasOwnProperty('key') ? assignedTo.key : assignedTo;
             contactToSave = {
               ...contactToSave,
-              assigned_to: `user-${contactToSave.assigned_to.key}`,
+              assigned_to: `user-${assignedToID}`,
             };
           }
           this.props.saveContact(
@@ -3231,17 +3235,46 @@ class ContactDetailScreen extends React.Component {
         break;
       }
       case 'connection': {
-        iconType = 'FontAwesome';
-        iconName = 'users';
+        if (field.name.includes('subassigned')) {
+          iconType = 'MaterialCommunityIcons';
+          iconName = 'briefcase-account-outline';
+        } else if (field.name.includes('relation')) {
+          iconType = 'FontAwesome5';
+          iconName = 'people-arrows';
+        } else if (field.name.includes('people_groups')) {
+          iconType = 'FontAwesome';
+          iconName = 'globe';
+        } else if (field.name.includes('coach')) {
+          iconType = 'MaterialCommunityIcons';
+          iconName = 'teach';
+        } else if (field.name.includes('bapti')) {
+          iconType = 'FontAwesome5';
+          iconName = 'water';
+        } else if (field.name.includes('group')) {
+          iconType = 'MaterialIcons';
+          iconName = 'groups';
+        } else if (field.name.includes('train')) {
+          iconType = 'FontAwesome5';
+          iconName = 'chalkboard-teacher';
+        } else {
+          iconType = 'MaterialIcons';
+          iconName = 'group-work';
+        }
         break;
       }
       case 'multi_select': {
         if (field.name.includes('tag')) {
           iconType = 'AntDesign';
           iconName = 'tags';
+        } else if (field.name.includes('email')) {
+          iconType = 'FontAwesome';
+          iconName = 'envelope';
+        } else if (field.name.includes('sources')) {
+          iconType = 'FontAwesome5';
+          iconName = 'compress-arrows-alt';
         } else {
-          iconType = 'MaterialCommunityIcons';
-          iconName = 'hexagon-multiple';
+          iconType = 'Ionicons';
+          iconName = 'list-circle';
         }
         break;
       }
@@ -3258,6 +3291,15 @@ class ContactDetailScreen extends React.Component {
         } else if (field.name.includes('facebook')) {
           iconType = 'MaterialCommunityIcons';
           iconName = 'facebook';
+        } else if (field.name.includes('instagram')) {
+          iconType = 'MaterialCommunityIcons';
+          iconName = 'instagram';
+        } else if (field.name.includes('whatsapp')) {
+          iconType = 'MaterialCommunityIcons';
+          iconName = 'whatsapp';
+        } else if (field.name.includes('address')) {
+          iconType = 'FontAwesome5';
+          iconName = 'directions';
         } else {
           iconType = 'Feather';
           iconName = 'hash';
@@ -3265,18 +3307,50 @@ class ContactDetailScreen extends React.Component {
         break;
       }
       case 'key_select': {
-        iconType = 'MaterialCommunityIcons';
-        iconName = 'hexagon';
+        if (field.name.includes('faith_status')) {
+          iconType = 'FontAwesome5';
+          iconName = 'cross';
+        } else if (field.name.includes('seeker_path')) {
+          iconType = 'MaterialCommunityIcons';
+          iconName = 'map-marker-path';
+        } else if (field.name.includes('gender')) {
+          iconType = 'FontAwesome5';
+          iconName = 'transgender';
+        } else if (field.name.includes('age')) {
+          iconType = 'FontAwesome5';
+          iconName = 'user-clock';
+        } else {
+          iconType = 'Ionicons';
+          iconName = 'list-circle';
+        }
         break;
       }
       case 'user_select': {
-        iconType = 'FontAwesome';
-        iconName = 'user';
+        if (field.name.includes('assigned_to')) {
+          iconType = 'MaterialCommunityIcons';
+          iconName = 'briefcase-account';
+        } else {
+          iconType = 'FontAwesome';
+          iconName = 'user';
+        }
+        break;
+      }
+      case 'text': {
+        if (field.name.includes('nickname')) {
+          iconType = 'FontAwesome5';
+          iconName = 'user-tag';
+        } else if (field.name.includes('name')) {
+          iconType = 'FontAwesome5';
+          iconName = 'user-alt';
+        } else {
+          iconType = 'Entypo';
+          iconName = 'text';
+        }
         break;
       }
       default: {
-        iconType = 'FontAwesome';
-        iconName = 'user';
+        iconType = 'MaterialCommunityIcons';
+        iconName = 'square-small';
         break;
       }
     }
@@ -3495,7 +3569,7 @@ class ContactDetailScreen extends React.Component {
             <Col style={{ paddingBottom: 15 }}>
               <Row style={[styles.formRow, { paddingTop: 10 }]}>
                 <Col style={[styles.formIconLabel, { marginRight: 10 }]}>
-                  <Icon type="FontAwesome" name="user" style={styles.formIcon} />
+                  <Icon type="Octicons" name="milestone" style={styles.formIcon} />
                 </Col>
                 <Col>
                   <Label
@@ -3994,7 +4068,7 @@ class ContactDetailScreen extends React.Component {
             <Col style={{ paddingBottom: 15 }}>
               <Row style={[styles.formRow, { paddingTop: 10 }]}>
                 <Col style={[styles.formIconLabel, { marginRight: 10 }]}>
-                  <Icon type="FontAwesome" name="user" style={styles.formIcon} />
+                  <Icon type="Octicons" name="milestone" style={styles.formIcon} />
                 </Col>
                 <Col>
                   <Label
@@ -4034,7 +4108,7 @@ class ContactDetailScreen extends React.Component {
             <Row style={styles.formFieldMargin}>
               <Col style={styles.formIconLabelCol}>
                 <View style={styles.formIconLabelView}>
-                  <Icon type="FontAwesome" name="user" style={styles.formIcon} />
+                  <Icon type="Octicons" name="primitive-dot" style={styles.formIcon} />
                 </View>
               </Col>
               <Col>
@@ -4186,6 +4260,7 @@ class ContactDetailScreen extends React.Component {
               selectedValue={this.state.contact[field.name]}
               onValueChange={(value) => this.setContactCustomFieldValue(field.name, value)}
               textStyle={{ color: Colors.tintColor }}>
+              <Picker.Item key={-1} label={''} value={''} />
               {Object.keys(field.default).map((key) => {
                 const optionData = field.default[key];
                 return <Picker.Item key={key} label={optionData.label} value={key} />;
@@ -4196,10 +4271,11 @@ class ContactDetailScreen extends React.Component {
         break;
       }
       case 'user_select': {
+        const selectedValue = propExist && value.hasOwnProperty('key') ? value.key : value;
         mappedValue = (
           <Picker
             mode="dropdown"
-            selectedValue={propExist ? value.key : null}
+            selectedValue={propExist ? selectedValue : null}
             onValueChange={(value) => this.setContactCustomFieldValue(field.name, value)}
             textStyle={{ color: Colors.tintColor }}>
             {[...this.state.users, ...this.state.assignedToContacts].map((item) => {
