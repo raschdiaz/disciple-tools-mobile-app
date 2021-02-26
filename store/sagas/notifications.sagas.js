@@ -8,7 +8,7 @@ export function* getNotificationsByUser({ domain, token, allNotifications, offse
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `https://${domain}/wp-json/dt/v1/notifications/get_notifications`,
+      url: `http://${domain}/wp-json/dt/v1/notifications/get_notifications`,
       data: {
         method: 'POST',
         headers: {
@@ -66,7 +66,7 @@ export function* getNotificationsCount({ domain, token }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `https://${domain}/wp-json/dt/v1/notifications/get_new_notifications_count`,
+      url: `http://${domain}/wp-json/dt/v1/notifications/get_new_notifications_count`,
       data: {
         method: 'POST',
         headers: {
@@ -115,7 +115,7 @@ export function* markViewed({ domain, token, notificationId }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `https://${domain}/wp-json/dt/v1/notifications/mark_viewed/${notificationId}`,
+      url: `http://${domain}/wp-json/dt/v1/notifications/mark_viewed/${notificationId}`,
       data: {
         method: 'POST',
         headers: {
@@ -164,7 +164,7 @@ export function* markUnread({ domain, token, notificationId }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `https://${domain}/wp-json/dt/v1/notifications/mark_unread/${notificationId}`,
+      url: `http://${domain}/wp-json/dt/v1/notifications/mark_unread/${notificationId}`,
       data: {
         method: 'POST',
         headers: {
@@ -213,7 +213,7 @@ export function* markAllAsRead({ domain, token, userID }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `https://${domain}/wp-json/dt/v1/notifications/mark_all_viewed/${userID}`,
+      url: `http://${domain}/wp-json/dt/v1/notifications/mark_all_viewed/${userID}`,
       data: {
         method: 'POST',
         headers: {

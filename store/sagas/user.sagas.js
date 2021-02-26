@@ -11,7 +11,7 @@ export function* login({ domain, username, password }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `https://${domain}/wp-json/jwt-auth/v1/token`,
+      url: `http://${domain}/wp-json/jwt-auth/v1/token`,
       data: {
         method: 'POST',
         headers: {
@@ -96,7 +96,7 @@ export function* addPushToken({ domain, token, expoPushToken, uniqueId }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `https://${domain}/wp-json/dt/v1/user/update`,
+      url: `http://${domain}/wp-json/dt/v1/user/update`,
       data: {
         method: 'POST',
         headers: {
@@ -145,7 +145,7 @@ export function* getUserInfo({ domain, token }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `https://${domain}/wp-json/dt/v1/user/my`,
+      url: `http://${domain}/wp-json/dt/v1/user/my`,
       data: {
         method: 'GET',
         headers: {
@@ -190,7 +190,7 @@ export function* updateUserInfo({ domain, token, userInfo }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `https://${domain}/wp-json/dt/v1/user/update`,
+      url: `http://${domain}/wp-json/dt/v1/user/update`,
       data: {
         method: 'POST',
         headers: {

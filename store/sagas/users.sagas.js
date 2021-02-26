@@ -7,7 +7,7 @@ export function* getUsers({ domain, token }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `https://${domain}/wp-json/dt/v1/users/get_users?get_all=1`,
+      url: `http://${domain}/wp-json/dt/v1/users/get_users?get_all=1`,
       data: {
         method: 'GET',
         headers: {
@@ -60,7 +60,7 @@ export function* getContactFilters({ domain, token }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `https://${domain}/wp-json/dt/v1/users/get_filters?post_type=contacts&force_refresh=1`,
+      url: `http://${domain}/wp-json/dt/v1/users/get_filters?post_type=contacts&force_refresh=1`,
       data: {
         method: 'GET',
         headers: {
@@ -116,7 +116,7 @@ export function* getGroupFilters({ domain, token }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `https://${domain}/wp-json/dt/v1/users/get_filters?post_type=groups&force_refresh=1`,
+      url: `http://${domain}/wp-json/dt/v1/users/get_filters?post_type=groups&force_refresh=1`,
       data: {
         method: 'GET',
         headers: {
