@@ -6,6 +6,7 @@ const initialState = {
   loading: false,
   error: null,
   settings: {},
+  o365Token: {},
 };
 
 export default function publicReducer(state = initialState, action) {
@@ -37,6 +38,34 @@ export default function publicReducer(state = initialState, action) {
       };
     }
     case publicActions.PUBLIC_GET_SITE_SETTINGS_FAILURE: {
+      return {
+        ...newState,
+        error: action.error,
+        loading: false,
+      };
+    }
+    case publicActions.PUBLIC_CLEAR_SITE_SETTINGS: {
+      return {
+        ...newState,
+        settings: {},
+      };
+    }
+    case publicActions.PUBLIC_GET_O365_TOKEN_START: {
+      return {
+        ...newState,
+        o365Token: {},
+        loading: true,
+      };
+    }
+    case publicActions.PUBLIC_GET_O365_TOKEN_SUCCESS: {
+      let { o365Token } = action;
+      return {
+        ...newState,
+        o365Token,
+        loading: false,
+      };
+    }
+    case publicActions.PUBLIC_GET_O365_TOKEN_FAILURE: {
       return {
         ...newState,
         error: action.error,

@@ -26,6 +26,7 @@
       "useNextNotificationsApi": true,
       "versionCode": 192
     },
-    "description": ""
+    "description": "",
+    "scheme": "tools.disciple.app"
   }
 }

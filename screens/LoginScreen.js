@@ -27,6 +27,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import * as Localization from 'expo-localization';
 import { Row } from 'react-native-easy-grid';
 import { WebView } from 'react-native-webview';
+import * as ExpoLinking from 'expo-linking';
 
 import i18n from '../languages';
 import locales from '../languages/locales';
@@ -51,7 +52,7 @@ import { logout } from '../store/actions/user.actions';
 import { getActiveQuestionnaires } from '../store/actions/questionnaire.actions';
 import { getNotificationsCount } from '../store/actions/notifications.actions';
 import sharedTools from '../shared';
-import { getSiteSettings } from '../store/actions/public.actions';
+import { clearSiteSettings, getSiteSettings, getO365Token } from '../store/actions/public.actions';
 import o365ButtonImage from '../assets/images/0365_login_link.png';
 //
 const styles = StyleSheet.create({
@@ -226,19 +227,19 @@ class LoginScreen extends React.Component {
     mobileAppRequired: false,
     tagsRetrieved: false,
     siteSettingsRetrieved: false,
+    siteSettings: {},
     o365Credentials: {
       tenant_id: '',
       client_id: '',
       scopes: '',
       authorize_uri: '',
-      redirect_uri: 'tools.disciple.app://tools.disciple.app/android/callback',
+      redirect_uri: '',
       client_secret: '',
       token_uri: '',
       user_logout_uri: '',
     },
     renderMicrosoftButton: true,
     showO365View: false,
-    o365Code: '',
   };
 
   constructor(props) {
@@ -247,7 +248,7 @@ class LoginScreen extends React.Component {
       ...this.state,
       username: props.userData.username || '',
       password: '',
-      domain: props.userData.domain || '',
+      domain: props.userData.domain || '192.168.20.2:100/wordpress',
       domainIsInvalid: false,
       userIsInvalid: false,
       passwordIsInvalid: false,
@@ -310,24 +311,6 @@ class LoginScreen extends React.Component {
         publicReducerLoading,
       geonamesLength,
     };
-
-    if (siteSettings && siteSettings !== newState.siteSettings) {
-      newState = {
-        ...newState,
-        siteSettingsRetrieved: true,
-        siteSettings,
-      };
-
-      if (siteSettings.login_settings && siteSettings.login_settings.microsoft) {
-        newState = {
-          ...newState,
-          o365Credentials: {
-            ...newState.o365Credentials,
-            ...siteSettings.login_settings.microsoft,
-          },
-        };
-      }
-    }
 
     if (userData.token) {
       if (contactSettings) {
@@ -399,6 +382,28 @@ class LoginScreen extends React.Component {
         newState = {
           ...newState,
           tagsRetrieved: true,
+        };
+      }
+    }
+
+    if (
+      siteSettings &&
+      Object.keys(siteSettings).length > 0 &&
+      siteSettings !== newState.siteSettings
+    ) {
+      newState = {
+        ...newState,
+        siteSettingsRetrieved: true,
+        siteSettings,
+      };
+
+      if (siteSettings.login_settings && siteSettings.login_settings.microsoft) {
+        newState = {
+          ...newState,
+          o365Credentials: {
+            ...newState.o365Credentials,
+            ...siteSettings.login_settings.microsoft,
+          },
         };
       }
     }
@@ -527,6 +532,7 @@ class LoginScreen extends React.Component {
       usersReducerError,
       contactsReducerError,
       geonamesLastModifiedDate,
+      o365Token,
     } = this.props;
     const {
       contactSettingsRetrieved,
@@ -595,6 +601,14 @@ class LoginScreen extends React.Component {
       listsLastUpdate = new Date(listsLastUpdate).toISOString();
       ExpoFileSystemStorage.setItem('listsLastUpdate', listsLastUpdate);
       this.props.navigation.navigate('ContactList');
+    }
+
+    if (o365Token && prevProps.o365Token !== o365Token && Object.keys(o365Token).length > 0) {
+      console.log('o365Token');
+      console.log(o365Token);
+      let decodedToken = sharedTools.decodeO365Token(o365Token.access_token);
+      console.log('decodedToken');
+      console.log(decodedToken);
     }
 
     const userError = prevProps.userReducerError !== userReducerError && userReducerError;
@@ -784,6 +798,31 @@ class LoginScreen extends React.Component {
     Linking.openURL(`https://disciple-tools.readthedocs.io/en/latest/app`);
   };
 
+  getO365Uri = () => {
+    let link = '';
+    let o365Credentials = this.state.o365Credentials;
+    link = `${o365Credentials.authorize_uri.replace(
+      '{tenant_id}',
+      o365Credentials.tenant_id,
+    )}?client_id=${o365Credentials.client_id}&redirect_uri=${o365Credentials.redirect_uri}&scope=${
+      o365Credentials.scopes
+    }&response_type=code&response_mode=query`;
+    return link;
+  };
+
+  getO365TokenUriAndBody = (code) => {
+    let o365Credentials = this.state.o365Credentials;
+    let params = `client_id=${o365Credentials.client_id}&redirect_uri=${o365Credentials.redirect_uri}&scope=${o365Credentials.scopes}&code=${code}&grant_type=authorization_code`;
+    let url = `${o365Credentials.token_uri.replace(
+      '{tenant_id}',
+      o365Credentials.tenant_id,
+    )}?${params}`;
+    return {
+      url,
+      params,
+    };
+  };
+
   // TODO: How to disable iCloud save password feature?
   render() {
     const errorToast = (
@@ -829,7 +868,7 @@ class LoginScreen extends React.Component {
             height: height,
           }}
           source={{
-            uri: `https://login.microsoftonline.com/${this.state.o365Credentials.tenant_id}/oauth2/v2.0/authorize?client_id=${this.state.o365Credentials.client_id}&redirect_uri=${this.state.o365Credentials.redirect_uri}&scope=${this.state.o365Credentials.scope}&response_type=code&response_mode=query`,
+            uri: this.getO365Uri(),
           }}
           javaScriptEnabled={true}
           domStorageEnabled={true}
@@ -843,18 +882,16 @@ class LoginScreen extends React.Component {
               this.setState(
                 {
                   showO365View: false,
-                  o365Code: code,
                 },
                 () => {
-                  console.log(this.state.o365Code);
                   // POST code to get access_token
+                  this.props.getO365Token(this.getO365TokenUriAndBody(code));
                 },
               );
             }
           }}
           onShouldStartLoadWithRequest={(request) => {
-            // Only allow navigating within this website
-            return request.url.startsWith('https://login.microsoftonline.com/');
+            return true;
           }}
           startInLoadingState={true}
           injectedJavaScript={`document.getElementsByTagName('body')[0].style.height = '${height}px';`}
@@ -996,9 +1033,19 @@ class LoginScreen extends React.Component {
                           }}>
                           <TouchableOpacity
                             onPress={() => {
-                              this.setState({
-                                showO365View: true,
-                              });
+                              this.setState(
+                                (prevState) => ({
+                                  o365Credentials: {
+                                    ...prevState.o365Credentials,
+                                    redirect_uri: ExpoLinking.makeUrl('login'),
+                                  },
+                                }),
+                                () => {
+                                  this.setState({
+                                    showO365View: true,
+                                  });
+                                },
+                              );
                             }}
                             activeOpacity={1}>
                             <Image source={o365ButtonImage}></Image>
@@ -1008,6 +1055,7 @@ class LoginScreen extends React.Component {
                       <Button
                         style={styles.signInButton}
                         onPress={() => {
+                          this.props.clearSiteSettings();
                           this.setState({
                             siteSettingsRetrieved: false,
                           });
@@ -1297,6 +1345,7 @@ const mapStateToProps = (state) => ({
   siteSettings: state.publicReducer.settings,
   publicReducerLoading: state.publicReducer.loading,
   publicReducerError: state.publicReducer.error,
+  o365Token: state.publicReducer.o365Token,
 });
 const mapDispatchToProps = (dispatch) => ({
   loginDispatch: (domain, username, password) => {
@@ -1355,6 +1404,12 @@ const mapDispatchToProps = (dispatch) => ({
   },
   getSiteSettings: (domain) => {
     dispatch(getSiteSettings(domain));
+  },
+  clearSiteSettings: () => {
+    dispatch(clearSiteSettings());
+  },
+  getO365Token: (url) => {
+    dispatch(getO365Token(url));
   },
 });
 export default connect(mapStateToProps, mapDispatchToProps)(LoginScreen);
