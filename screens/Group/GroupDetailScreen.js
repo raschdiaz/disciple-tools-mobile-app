@@ -121,6 +121,18 @@ const styles = StyleSheet.create({
     height: '100%',
     width: '100%',
   },
+  activeImageIcon: {
+    opacity: 1,
+    height: 30,
+    width: 30,
+    position:'absolute',left:0,bottom:0,right:0,top:0,resizeMode:'contain'
+  },
+  inactiveImageIcon: {
+    opacity: 0.15,
+    height: 30,
+    width: 30,
+    position:'absolute',left:0,bottom:0,right:0,top:0,resizeMode:'contain'
+  },
   toggleText: {
     textAlign: 'center',
   },
@@ -526,6 +538,8 @@ const initialState = {
   footerHeight: 0,
   nameRequired: false,
   executingBack: false,
+  iconQuantity: 0,
+  progressCircleFromWeb: [],
   keyword: '',
   suggestedUsers: [],
   height: sharedTools.commentFieldMinHeight,
@@ -1405,6 +1419,56 @@ class GroupDetailScreen extends React.Component {
 
   onRefresh(groupId, forceRefresh = false) {
     if (!self.state.loading || forceRefresh) {
+
+      fetch('http://192.168.1.10/wordpress/wp-json/dt-public/dt-core/v1/settings', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      .then(async (response) => {
+        return response.text().then((responseJSON) => {
+          return JSON.parse(responseJSON);
+        });
+      })
+      .then((response) => {
+
+        console.log("response ", response)
+
+        this.state.progressCircleFromWeb = []
+
+        if (response.health_metrics){
+          this.state.iconQuantity = Object.keys(response.health_metrics.default).length
+
+          console.log(this.state.iconQuantity)
+
+          var keys = Object.keys(response.health_metrics.default)
+
+          keys.forEach(element => {
+            var object = response.health_metrics.default[element]
+            object.key = element
+
+            if(object.image){
+              if(object.image.includes("dt-assets")){
+                object.image = response.health_metrics.url_image_default + object.image
+              } else {
+                object.image = response.health_metrics.url_image_custom + object.image
+              }
+          }
+
+            this.state.progressCircleFromWeb.push(object)
+          });
+
+          console.log("this.state.progressCircleFromWeb ", this.state.progressCircleFromWeb)
+
+        }
+
+        return {
+          status: 200,
+          data: response,
+        };
+      })
+
       self.getGroupById(groupId);
       self.onRefreshCommentsActivities(groupId, true);
       self.getShareSettings(groupId);
@@ -2712,6 +2776,3740 @@ class GroupDetailScreen extends React.Component {
     </View>
   );
 
+  renderHealthMilestonesTemplateIcons(){
+
+    console.log("this.state.iconQuantity ", this.state.iconQuantity)
+
+    if(this.state.iconQuantity > 0){
+      switch (this.state.iconQuantity) {
+        case 5:
+          return this.renderHealthMilestones5Icons();
+        case 6:
+          return this.renderHealthMilestones6Icons();
+        case 7:
+          return this.renderHealthMilestones7Icons();
+        case 8:
+          return this.renderHealthMilestones8Icons();
+        case 9:
+          return this.renderHealthMilestones9Icons();
+        case 10:
+          return this.renderHealthMilestones10Icons();
+        case 11:
+          return this.renderHealthMilestones11Icons();
+        case 12:
+          return this.renderHealthMilestones12Icons();
+      }
+    } else {
+      return this.renderHealthMilestones()
+    }
+  }
+
+
+  renderHealthMilestones12Icons() {
+    return (
+      <Grid pointerEvents={this.state.onlyView ? 'none' : 'auto'} style={{ position: 'relative', left: -20 }}>
+        <Row style={{ height: spacing }} />
+        <Row style={{ height: sideSize }}>
+          <Col style={{ width: spacing }} />
+
+
+          <Col style={{ width: sideSize }}>
+
+            <Image
+              source={circleIcon}
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                alignSelf: 'center',
+                position: 'absolute',
+                height: '95%',
+                width: '95%',
+                marginTop: '2%',
+                marginRight: '2%',
+                marginBottom: '2%',
+                marginLeft: '2%',
+                opacity: this.onCheckExistingHealthMetric('church_commitment') ? 1 : 0.15,
+              }}
+            />
+
+            <Image
+              source={dottedCircleIcon}
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                alignSelf: 'center',
+                position: 'absolute',
+                height: '100%',
+                width: '100%',
+                opacity: this.onCheckExistingHealthMetric('church_commitment') ? 0.15 : 1,
+              }}
+            />
+
+            <Row>
+              <Col style={{margin: 10}}>
+                
+                <Row size={1}>
+                  <Col size={3}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[0].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[0].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[0].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[0].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[0].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={3}></Col>
+                </Row>
+                
+                <Row size={1}>
+                  <Col size={1}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[1].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[1].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[1].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={3}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[2].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[2].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[2].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={1}></Col>
+                </Row>
+
+                <Row size={1}>
+                  <Col size={2}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[3].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[3].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[3].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={1}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[4].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[4].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[4].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={2}></Col>
+                </Row>
+                
+                <Row size={1}>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[5].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[5].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[5].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[5].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[5].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={5}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[6].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[6].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[6].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[6].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[6].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                </Row>
+
+                <Row size={1}>
+                  <Col size={2}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[7].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[7].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[7].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[7].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[7].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={1}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[8].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[8].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[8].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[8].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[8].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={2}></Col>
+                </Row>
+
+                <Row size={1}>
+                  <Col size={1}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[9].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[9].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[9].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[9].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[9].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={3}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[10].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[10].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[10].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[10].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[10].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={1}></Col>
+                </Row>
+
+                <Row size={1}>
+                  <Col size={3}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[11].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[11].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[11].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[11].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[11].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={3}></Col>
+                </Row>
+
+              </Col>
+            </Row>
+
+          </Col>
+
+
+          <Col style={{ width: spacing }} />
+        </Row>
+        <Row style={{ height: spacing }} />
+      </Grid>
+    );
+  }
+
+  renderHealthMilestones11Icons() {
+    return (
+      <Grid pointerEvents={this.state.onlyView ? 'none' : 'auto'} style={{ position: 'relative', left: -20 }}>
+        <Row style={{ height: spacing }} />
+        <Row style={{ height: sideSize }}>
+          <Col style={{ width: spacing }} />
+
+
+          <Col style={{ width: sideSize }}>
+
+            <Image
+              source={circleIcon}
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                alignSelf: 'center',
+                position: 'absolute',
+                height: '95%',
+                width: '95%',
+                marginTop: '2%',
+                marginRight: '2%',
+                marginBottom: '2%',
+                marginLeft: '2%',
+                opacity: this.onCheckExistingHealthMetric('church_commitment') ? 1 : 0.15,
+              }}
+            />
+
+            <Image
+              source={dottedCircleIcon}
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                alignSelf: 'center',
+                position: 'absolute',
+                height: '100%',
+                width: '100%',
+                opacity: this.onCheckExistingHealthMetric('church_commitment') ? 0.15 : 1,
+              }}
+            />
+
+
+            <Row>
+              <Col style={{margin: 10}}>
+                
+                <Row size={1}>
+                  <Col size={3}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[0].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[0].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[0].key)
+                                    ? styles.activeImage
+                                    : styles.inactiveImage
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[0].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[0].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={3}></Col>
+                </Row>
+                
+                <Row size={1}>
+                  <Col size={1}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[1].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[1].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[1].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={3}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[2].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[2].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[2].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={1}></Col>
+                </Row>
+
+                <Row size={1}>
+                  <Col size={2}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[3].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[3].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[3].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={1}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[4].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[4].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[4].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={2}></Col>
+                </Row>
+                
+                <Row size={1}>
+                  <Col size={3}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[5].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[5].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[5].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[5].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[5].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={3}></Col>
+                </Row>
+
+                <Row size={1}>
+                  <Col size={2}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[6].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[6].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[6].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[6].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[6].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={1}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[7].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[7].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[7].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[7].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[7].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={2}></Col>
+                </Row>
+
+                <Row size={1}>
+                  <Col size={1}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[8].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[8].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[8].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[8].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[8].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={3}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[9].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[9].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[9].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[9].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[9].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={1}></Col>
+                </Row>
+
+                <Row size={1}>
+                  <Col size={3}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[10].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[10].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[10].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[10].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[10].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={3}></Col>
+                </Row>
+
+              </Col>
+            </Row>
+
+          </Col>
+
+
+          <Col style={{ width: spacing }} />
+        </Row>
+        <Row style={{ height: spacing }} />
+      </Grid>
+    );
+  }
+
+  renderHealthMilestones10Icons() {
+    return (
+      <Grid pointerEvents={this.state.onlyView ? 'none' : 'auto'} style={{ position: 'relative', left: -20 }}>
+        <Row style={{ height: spacing }} />
+        <Row style={{ height: sideSize }}>
+          <Col style={{ width: spacing }} />
+
+
+          <Col style={{ width: sideSize }}>
+
+            <Image
+              source={circleIcon}
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                alignSelf: 'center',
+                position: 'absolute',
+                height: '95%',
+                width: '95%',
+                marginTop: '2%',
+                marginRight: '2%',
+                marginBottom: '2%',
+                marginLeft: '2%',
+                opacity: this.onCheckExistingHealthMetric('church_commitment') ? 1 : 0.15,
+              }}
+            />
+
+            <Image
+              source={dottedCircleIcon}
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                alignSelf: 'center',
+                position: 'absolute',
+                height: '100%',
+                width: '100%',
+                opacity: this.onCheckExistingHealthMetric('church_commitment') ? 0.15 : 1,
+              }}
+            />
+
+            <Row>
+              <Col style={{margin: 10}}>
+                
+                <Row size={1}>
+                  <Col size={3}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[0].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  // uri: "http://192.168.1.10/wordpress/wp-content/uploads/2021/02/icon.jpeg"
+                                  uri: this.state.progressCircleFromWeb[0].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[0].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[0].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={3}></Col>
+                </Row>
+                
+                <Row size={1}>
+                  <Col size={1}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[1].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[1].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[1].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={3}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[2].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[2].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[2].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={1}></Col>
+                </Row>
+
+                <Row size={1}>
+                  <Col size={2}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[3].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[3].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[3].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={1}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[4].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[4].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[4].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={2}></Col>
+                </Row>
+                
+                <Row size={1}>
+                  <Col size={7}></Col>
+                </Row>
+
+                <Row size={1}>
+                  <Col size={2}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[5].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[5].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[5].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[5].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[5].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={1}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[6].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[6].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[6].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[6].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[6].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={2}></Col>
+                </Row>
+
+                <Row size={1}>
+                  <Col size={1}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[7].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[7].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[7].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[7].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[7].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={3}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[8].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[8].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[8].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[8].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[8].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={1}></Col>
+                </Row>
+
+                <Row size={1}>
+                  <Col size={3}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[9].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[9].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[9].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[9].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[9].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={3}></Col>
+                </Row>
+
+              </Col>
+            </Row>
+
+          </Col>
+
+
+          <Col style={{ width: spacing }} />
+        </Row>
+        <Row style={{ height: spacing }} />
+      </Grid>
+    );
+  }
+
+  renderHealthMilestones9Icons() {
+    return (
+      <Grid pointerEvents={this.state.onlyView ? 'none' : 'auto'} style={{ position: 'relative', left: -20 }}>
+        <Row style={{ height: spacing }} />
+        <Row style={{ height: sideSize }}>
+          <Col style={{ width: spacing }} />
+
+
+          <Col style={{ width: sideSize }}>
+
+            <Image
+              source={circleIcon}
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                alignSelf: 'center',
+                position: 'absolute',
+                height: '95%',
+                width: '95%',
+                marginTop: '2%',
+                marginRight: '2%',
+                marginBottom: '2%',
+                marginLeft: '2%',
+                opacity: this.onCheckExistingHealthMetric('church_commitment') ? 1 : 0.15,
+              }}
+            />
+
+            <Image
+              source={dottedCircleIcon}
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                alignSelf: 'center',
+                position: 'absolute',
+                height: '100%',
+                width: '100%',
+                opacity: this.onCheckExistingHealthMetric('church_commitment') ? 0.15 : 1,
+              }}
+            />
+
+            <Row>
+              <Col style={{margin: 10}}>
+                
+                <Row size={1}>
+                  <Col size={3}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[0].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[0].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[0].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[0].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[0].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={3}></Col>
+                </Row>
+                
+                <Row size={1}>
+                  <Col size={1}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[1].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[1].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[1].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={3}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[2].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[2].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[2].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={1}></Col>
+                </Row>
+
+                <Row size={1}></Row>
+                
+                <Row size={1}>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[3].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[3].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[3].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={2}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[4].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[4].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[4].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={2}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[5].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[5].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[5].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[5].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[5].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                </Row>
+
+                <Row size={1}></Row>
+
+                <Row size={1}>
+                  <Col size={1}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[6].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[6].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[6].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[6].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[6].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={3}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[7].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[7].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[7].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[7].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[7].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={1}></Col>
+                </Row>
+
+                <Row size={1}>
+                  <Col size={3}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[8].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[8].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[8].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[8].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[8].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={3}></Col>
+                </Row>
+
+              </Col>
+            </Row>
+          
+          </Col>
+
+
+          <Col style={{ width: spacing }} />
+        </Row>
+        <Row style={{ height: spacing }} />
+      </Grid>
+    );
+  }
+
+  renderHealthMilestones8Icons() {
+    return (
+      <Grid pointerEvents={this.state.onlyView ? 'none' : 'auto'} style={{ position: 'relative', left: -20 }}>
+        <Row style={{ height: spacing }} />
+        <Row style={{ height: sideSize }}>
+          <Col style={{ width: spacing }} />
+
+
+          <Col style={{ width: sideSize }}>
+
+            <Image
+              source={circleIcon}
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                alignSelf: 'center',
+                position: 'absolute',
+                height: '95%',
+                width: '95%',
+                marginTop: '2%',
+                marginRight: '2%',
+                marginBottom: '2%',
+                marginLeft: '2%',
+                opacity: this.onCheckExistingHealthMetric('church_commitment') ? 1 : 0.15,
+              }}
+            />
+
+            <Image
+              source={dottedCircleIcon}
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                alignSelf: 'center',
+                position: 'absolute',
+                height: '100%',
+                width: '100%',
+                opacity: this.onCheckExistingHealthMetric('church_commitment') ? 0.15 : 1,
+              }}
+            />
+
+            <Row>
+              <Col style={{margin: 10}}>
+                
+                <Row size={1}>
+                  <Col size={3}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[0].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[0].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[0].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[0].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[0].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={3}></Col>
+                </Row>
+                
+                <Row size={1}></Row>
+
+                <Row size={1}>
+                  <Col size={2}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[1].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[1].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[1].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={1}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[2].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[2].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[2].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={2}></Col>
+                </Row>
+                
+                <Row size={1}>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[3].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[3].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[3].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={5}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[4].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[4].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[4].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                </Row>
+
+                <Row size={1}>
+                  <Col size={2}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[5].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[5].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[5].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[5].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[5].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={1}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[6].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[6].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[6].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[6].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[6].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={2}></Col>
+                </Row>
+                
+                <Row size={1}></Row>
+
+                <Row size={1}>
+                  <Col size={3}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[7].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[7].image
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[7].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[7].key)
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {
+                              this.state.progressCircleFromWeb[7].label
+                            }
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={3}></Col>
+                </Row>
+
+              </Col>
+            </Row>
+
+          </Col>
+
+
+          <Col style={{ width: spacing }} />
+        </Row>
+        <Row style={{ height: spacing }} />
+      </Grid>
+    );
+  }
+
+  renderHealthMilestones7Icons() {
+    return (
+      <Grid pointerEvents={this.state.onlyView ? 'none' : 'auto'} style={{ position: 'relative', left: -20 }}>
+        <Row style={{ height: spacing }} />
+        <Row style={{ height: sideSize }}>
+          <Col style={{ width: spacing }} />
+
+
+          <Col style={{ width: sideSize }}>
+
+            <Image
+              source={circleIcon}
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                alignSelf: 'center',
+                position: 'absolute',
+                height: '95%',
+                width: '95%',
+                marginTop: '2%',
+                marginRight: '2%',
+                marginBottom: '2%',
+                marginLeft: '2%',
+                opacity: this.onCheckExistingHealthMetric('church_commitment') ? 1 : 0.15,
+              }}
+            />
+
+            <Image
+              source={dottedCircleIcon}
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                alignSelf: 'center',
+                position: 'absolute',
+                height: '100%',
+                width: '100%',
+                opacity: this.onCheckExistingHealthMetric('church_commitment') ? 0.15 : 1,
+              }}
+            />
+
+
+              <Row>
+
+                <Col style={{margin: 10}}>
+                  
+                  <Row size={1}>
+                    <Col size={3}></Col>
+                    <Col size={1}>
+                      <Row size={1}>
+                        <Col>
+                          <Row size={60}>
+                            <Col>
+                              <TouchableOpacity
+                                onPress={() => {
+                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[0].key);
+                                }}
+                                activeOpacity={1}>
+                                <Image
+                                  source={{
+                                    uri: this.state.progressCircleFromWeb[0].image
+                                  }}
+                                  style={
+                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[0].key)
+                                      ? styles.activeImageIcon
+                                      : styles.inactiveImageIcon
+                                  }
+                                />
+                              </TouchableOpacity>
+                            </Col>
+                          </Row>
+                          <Row
+                            size={40}
+                            style={{
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                            }}>
+                            <Text
+                              style={[
+                                styles.toggleText,
+                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[0].key)
+                                  ? styles.activeToggleText
+                                  : styles.inactiveToggleText,
+                              ]}>
+                              {
+                                this.state.progressCircleFromWeb[0].label
+                              }
+                            </Text>
+                          </Row>
+                        </Col>
+                      </Row>
+                    </Col>
+                    <Col size={3}></Col>
+                  </Row>
+                  
+                  <Row size={1}>
+                    <Col size={1}></Col>
+                    <Col size={1}>
+                      <Row size={1}>
+                        <Col>
+                          <Row size={60}>
+                            <Col>
+                              <TouchableOpacity
+                                onPress={() => {
+                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[1].key);
+                                }}
+                                activeOpacity={1}>
+                                <Image
+                                  source={{
+                                    uri: this.state.progressCircleFromWeb[1].image
+                                  }}
+                                  style={
+                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
+                                      ? styles.activeImageIcon
+                                      : styles.inactiveImageIcon
+                                  }
+                                />
+                              </TouchableOpacity>
+                            </Col>
+                          </Row>
+                          <Row
+                            size={40}
+                            style={{
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                            }}>
+                            <Text
+                              style={[
+                                styles.toggleText,
+                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
+                                  ? styles.activeToggleText
+                                  : styles.inactiveToggleText,
+                              ]}>
+                              {
+                                this.state.progressCircleFromWeb[1].label
+                              }
+                            </Text>
+                          </Row>
+                        </Col>
+                      </Row>
+                    </Col>
+                    <Col size={3}></Col>
+                    <Col size={1}>
+                      <Row size={1}>
+                        <Col>
+                          <Row size={60}>
+                            <Col>
+                              <TouchableOpacity
+                                onPress={() => {
+                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[2].key);
+                                }}
+                                activeOpacity={1}>
+                                <Image
+                                  source={{
+                                    uri: this.state.progressCircleFromWeb[2].image
+                                  }}
+                                  style={
+                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
+                                      ? styles.activeImageIcon
+                                      : styles.inactiveImageIcon
+                                  }
+                                />
+                              </TouchableOpacity>
+                            </Col>
+                          </Row>
+                          <Row
+                            size={40}
+                            style={{
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                            }}>
+                            <Text
+                              style={[
+                                styles.toggleText,
+                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
+                                  ? styles.activeToggleText
+                                  : styles.inactiveToggleText,
+                              ]}>
+                              {
+                                this.state.progressCircleFromWeb[2].label
+                              }
+                            </Text>
+                          </Row>
+                        </Col>
+                      </Row>
+                    </Col>
+                    <Col size={1}></Col>
+                  </Row>
+
+                  <Row size={1}></Row>
+                  
+                  <Row size={1}>
+                    <Col size={3}></Col>
+                    <Col size={1}>
+                      <Row size={1}>
+                        <Col>
+                          <Row size={60}>
+                            <Col>
+                              <TouchableOpacity
+                                onPress={() => {
+                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[3].key);
+                                }}
+                                activeOpacity={1}>
+                                <Image
+                                  source={{
+                                    uri: this.state.progressCircleFromWeb[3].image
+                                  }}
+                                  style={
+                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
+                                      ? styles.activeImageIcon
+                                      : styles.inactiveImageIcon
+                                  }
+                                />
+                              </TouchableOpacity>
+                            </Col>
+                          </Row>
+                          <Row
+                            size={40}
+                            style={{
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                            }}>
+                            <Text
+                              style={[
+                                styles.toggleText,
+                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
+                                  ? styles.activeToggleText
+                                  : styles.inactiveToggleText,
+                              ]}>
+                              {
+                                this.state.progressCircleFromWeb[3].key.label
+                              }
+                            </Text>
+                          </Row>
+                        </Col>
+                      </Row>
+                    </Col>
+                    <Col size={3}></Col>
+                  </Row>
+
+                  <Row size={1}></Row>
+
+                  <Row size={1}>
+                    <Col size={1}></Col>
+                    <Col size={1}>
+                      <Row size={1}>
+                        <Col>
+                          <Row size={60}>
+                            <Col>
+                              <TouchableOpacity
+                                onPress={() => {
+                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[4].key);
+                                }}
+                                activeOpacity={1}>
+                                <Image
+                                  source={{
+                                    uri: this.state.progressCircleFromWeb[4].image
+                                  }}
+                                  style={
+                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
+                                      ? styles.activeImageIcon
+                                      : styles.inactiveImageIcon
+                                  }
+                                />
+                              </TouchableOpacity>
+                            </Col>
+                          </Row>
+                          <Row
+                            size={40}
+                            style={{
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                            }}>
+                            <Text
+                              style={[
+                                styles.toggleText,
+                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
+                                  ? styles.activeToggleText
+                                  : styles.inactiveToggleText,
+                              ]}>
+                              {
+                                this.state.progressCircleFromWeb[4].label
+                              }
+                            </Text>
+                          </Row>
+                        </Col>
+                      </Row>
+                    </Col>
+                    <Col size={3}></Col>
+                    <Col size={1}>
+                      <Row size={1}>
+                        <Col>
+                          <Row size={60}>
+                            <Col>
+                              <TouchableOpacity
+                                onPress={() => {
+                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[5].key);
+                                }}
+                                activeOpacity={1}>
+                                <Image
+                                  source={{
+                                    uri: this.state.progressCircleFromWeb[5].image
+                                  }}
+                                  style={
+                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[5].key)
+                                      ? styles.activeImageIcon
+                                      : styles.inactiveImageIcon
+                                  }
+                                />
+                              </TouchableOpacity>
+                            </Col>
+                          </Row>
+                          <Row
+                            size={40}
+                            style={{
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                            }}>
+                            <Text
+                              style={[
+                                styles.toggleText,
+                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[5].key)
+                                  ? styles.activeToggleText
+                                  : styles.inactiveToggleText,
+                              ]}>
+                              {
+                                this.state.progressCircleFromWeb[5].label
+                              }
+                            </Text>
+                          </Row>
+                        </Col>
+                      </Row>
+                    </Col>
+                    <Col size={1}></Col>
+                  </Row>
+
+                  <Row size={1}>
+                    <Col size={3}></Col>
+                    <Col size={1}>
+                      <Row size={1}>
+                        <Col>
+                          <Row size={60}>
+                            <Col>
+                              <TouchableOpacity
+                                onPress={() => {
+                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[6].key);
+                                }}
+                                activeOpacity={1}>
+                                <Image
+                                  source={{
+                                    uri: this.state.progressCircleFromWeb[6].image
+                                  }}
+                                  style={
+                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[6].key)
+                                      ? styles.activeImageIcon
+                                      : styles.inactiveImageIcon
+                                  }
+                                />
+                              </TouchableOpacity>
+                            </Col>
+                          </Row>
+                          <Row
+                            size={40}
+                            style={{
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                            }}>
+                            <Text
+                              style={[
+                                styles.toggleText,
+                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[6].key)
+                                  ? styles.activeToggleText
+                                  : styles.inactiveToggleText,
+                              ]}>
+                              {
+                                this.state.progressCircleFromWeb[6].label
+                              }
+                            </Text>
+                          </Row>
+                        </Col>
+                      </Row>
+                    </Col>
+                    <Col size={3}></Col>
+                  </Row>
+
+                </Col>
+
+              </Row>
+
+          </Col>
+
+
+          <Col style={{ width: spacing }} />
+        </Row>
+        <Row style={{ height: spacing }} />
+      </Grid>
+    );
+  }
+
+  renderHealthMilestones6Icons() {
+    return (
+      <Grid pointerEvents={this.state.onlyView ? 'none' : 'auto'} style={{ position: 'relative', left: -20 }}>
+        <Row style={{ height: spacing }} />
+        <Row style={{ height: sideSize }}>
+          <Col style={{ width: spacing }} />
+
+
+          <Col style={{ width: sideSize }}>
+
+            <Image
+              source={circleIcon}
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                alignSelf: 'center',
+                position: 'absolute',
+                height: '95%',
+                width: '95%',
+                marginTop: '2%',
+                marginRight: '2%',
+                marginBottom: '2%',
+                marginLeft: '2%',
+                opacity: this.onCheckExistingHealthMetric('church_commitment') ? 1 : 0.15,
+              }}
+            />
+
+            <Image
+              source={dottedCircleIcon}
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                alignSelf: 'center',
+                position: 'absolute',
+                height: '100%',
+                width: '100%',
+                opacity: this.onCheckExistingHealthMetric('church_commitment') ? 0.15 : 1,
+              }}
+            />
+
+
+              <Row>
+
+                <Col style={{margin: 10}}>
+                  
+                  <Row size={1}>
+                    <Col size={3}></Col>
+                    <Col size={1}>
+                      <Row size={1}>
+                        <Col>
+                          <Row size={60}>
+                            <Col>
+                              <TouchableOpacity
+                                onPress={() => {
+                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[0].key);
+                                }}
+                                activeOpacity={1}>
+                                <Image
+                                  source={{
+                                    uri: this.state.progressCircleFromWeb[0].image
+                                  }}
+                                  style={
+                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[0].key)
+                                      ? styles.activeImageIcon
+                                      : styles.inactiveImageIcon
+                                  }
+                                />
+                              </TouchableOpacity>
+                            </Col>
+                          </Row>
+                          <Row
+                            size={40}
+                            style={{
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                            }}>
+                            <Text
+                              style={[
+                                styles.toggleText,
+                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[0].key)
+                                  ? styles.activeToggleText
+                                  : styles.inactiveToggleText,
+                              ]}>
+                              {
+                                this.state.progressCircleFromWeb[0].label
+                              }
+                            </Text>
+                          </Row>
+                        </Col>
+                      </Row>
+                    </Col>
+                    <Col size={3}></Col>
+                  </Row>
+                  
+                  <Row size={1}>
+                    <Col size={1}></Col>
+                    <Col size={1}>
+                      <Row size={1}>
+                        <Col>
+                          <Row size={60}>
+                            <Col>
+                              <TouchableOpacity
+                                onPress={() => {
+                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[1].key);
+                                }}
+                                activeOpacity={1}>
+                                <Image
+                                  source={{
+                                    uri: this.state.progressCircleFromWeb[1].image
+                                  }}
+                                  style={
+                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
+                                      ? styles.activeImageIcon
+                                      : styles.inactiveImageIcon
+                                  }
+                                />
+                              </TouchableOpacity>
+                            </Col>
+                          </Row>
+                          <Row
+                            size={40}
+                            style={{
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                            }}>
+                            <Text
+                              style={[
+                                styles.toggleText,
+                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
+                                  ? styles.activeToggleText
+                                  : styles.inactiveToggleText,
+                              ]}>
+                              {
+                                this.state.progressCircleFromWeb[1].label
+                              }
+                            </Text>
+                          </Row>
+                        </Col>
+                      </Row>
+                    </Col>
+                    <Col size={3}></Col>
+                    <Col size={1}>
+                      <Row size={1}>
+                        <Col>
+                          <Row size={60}>
+                            <Col>
+                              <TouchableOpacity
+                                onPress={() => {
+                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[2].key);
+                                }}
+                                activeOpacity={1}>
+                                <Image
+                                  source={{
+                                    uri: this.state.progressCircleFromWeb[2].image
+                                  }}
+                                  style={
+                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
+                                      ? styles.activeImageIcon
+                                      : styles.inactiveImageIcon
+                                  }
+                                />
+                              </TouchableOpacity>
+                            </Col>
+                          </Row>
+                          <Row
+                            size={40}
+                            style={{
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                            }}>
+                            <Text
+                              style={[
+                                styles.toggleText,
+                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
+                                  ? styles.activeToggleText
+                                  : styles.inactiveToggleText,
+                              ]}>
+                              {
+                                this.state.progressCircleFromWeb[2].label
+                              }
+                            </Text>
+                          </Row>
+                        </Col>
+                      </Row>
+                    </Col>
+                    <Col size={1}></Col>
+                  </Row>
+
+                  <Row size={1}></Row>
+                  <Row size={1}></Row>
+                  <Row size={1}></Row>
+
+                  <Row size={1}>
+                    <Col size={1}></Col>
+                    <Col size={1}>
+                      <Row size={1}>
+                        <Col>
+                          <Row size={60}>
+                            <Col>
+                              <TouchableOpacity
+                                onPress={() => {
+                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[3].key);
+                                }}
+                                activeOpacity={1}>
+                                <Image
+                                  source={{
+                                    uri: this.state.progressCircleFromWeb[3].image
+                                  }}
+                                  style={
+                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
+                                      ? styles.activeImageIcon
+                                      : styles.inactiveImageIcon
+                                  }
+                                />
+                              </TouchableOpacity>
+                            </Col>
+                          </Row>
+                          <Row
+                            size={40}
+                            style={{
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                            }}>
+                            <Text
+                              style={[
+                                styles.toggleText,
+                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
+                                  ? styles.activeToggleText
+                                  : styles.inactiveToggleText,
+                              ]}>
+                              {
+                                this.state.progressCircleFromWeb[3].label
+                              }
+                            </Text>
+                          </Row>
+                        </Col>
+                      </Row>
+                    </Col>
+                    <Col size={3}></Col>
+                    <Col size={1}>
+                      <Row size={1}>
+                        <Col>
+                          <Row size={60}>
+                            <Col>
+                              <TouchableOpacity
+                                onPress={() => {
+                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[4].key);
+                                }}
+                                activeOpacity={1}>
+                                <Image
+                                  source={{
+                                    uri: this.state.progressCircleFromWeb[4].image
+                                  }}
+                                  style={
+                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
+                                      ? styles.activeImageIcon
+                                      : styles.inactiveImageIcon
+                                  }
+                                />
+                              </TouchableOpacity>
+                            </Col>
+                          </Row>
+                          <Row
+                            size={40}
+                            style={{
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                            }}>
+                            <Text
+                              style={[
+                                styles.toggleText,
+                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
+                                  ? styles.activeToggleText
+                                  : styles.inactiveToggleText,
+                              ]}>
+                              {
+                                this.state.progressCircleFromWeb[4].label
+                              }
+                            </Text>
+                          </Row>
+                        </Col>
+                      </Row>
+                    </Col>
+                    <Col size={1}></Col>
+                  </Row>
+
+                  <Row size={1}>
+                    <Col size={3}></Col>
+                    <Col size={1}>
+                      <Row size={1}>
+                        <Col>
+                          <Row size={60}>
+                            <Col>
+                              <TouchableOpacity
+                                onPress={() => {
+                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[5].key);
+                                }}
+                                activeOpacity={1}>
+                                <Image
+                                  source={{
+                                    uri: this.state.progressCircleFromWeb[5].image
+                                  }}
+                                  style={
+                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[5].key)
+                                      ? styles.activeImageIcon
+                                      : styles.inactiveImageIcon
+                                  }
+                                />
+                              </TouchableOpacity>
+                            </Col>
+                          </Row>
+                          <Row
+                            size={40}
+                            style={{
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                            }}>
+                            <Text
+                              style={[
+                                styles.toggleText,
+                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[5].key)
+                                  ? styles.activeToggleText
+                                  : styles.inactiveToggleText,
+                              ]}>
+                              {
+                                this.state.progressCircleFromWeb[5].label
+                              }
+                            </Text>
+                          </Row>
+                        </Col>
+                      </Row>
+                    </Col>
+                    <Col size={3}></Col>
+                  </Row>
+
+                </Col>
+
+              </Row>
+
+          </Col>
+
+
+          <Col style={{ width: spacing }} />
+        </Row>
+        <Row style={{ height: spacing }} />
+      </Grid>
+    );
+  }
+
+  renderHealthMilestones5Icons() {
+    return (
+      <Grid pointerEvents={this.state.onlyView ? 'none' : 'auto'} style={{ position: 'relative', left: -20 }}>
+        <Row style={{ height: spacing }} />
+        <Row style={{ height: sideSize }}>
+          <Col style={{ width: spacing }} />
+
+
+          <Col style={{ width: sideSize }}>
+
+            <Image
+              source={circleIcon}
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                alignSelf: 'center',
+                position: 'absolute',
+                height: '95%',
+                width: '95%',
+                marginTop: '2%',
+                marginRight: '2%',
+                marginBottom: '2%',
+                marginLeft: '2%',
+                opacity: this.onCheckExistingHealthMetric('church_commitment') ? 1 : 0.15,
+              }}
+            />
+
+            <Image
+              source={dottedCircleIcon}
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                alignSelf: 'center',
+                position: 'absolute',
+                height: '100%',
+                width: '100%',
+                opacity: this.onCheckExistingHealthMetric('church_commitment') ? 0.15 : 1,
+              }}
+            />
+
+
+              <Row>
+
+                <Col style={{margin: 10}}>
+                  
+                  <Row size={1}>
+                    <Col size={3}></Col>
+                    <Col size={1}>
+                      <Row size={1}>
+                        <Col>
+                          <Row size={60}>
+                            <Col>
+                              <TouchableOpacity
+                                onPress={() => {
+                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[0].key);
+                                }}
+                                activeOpacity={1}>
+                                <Image
+                                  source={{
+                                    uri: this.state.progressCircleFromWeb[0].image
+                                  }}
+                                  style={
+                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[0].key)
+                                      ? styles.activeImageIcon
+                                      : styles.inactiveImageIcon
+                                  }
+                                />
+                              </TouchableOpacity>
+                            </Col>
+                          </Row>
+                          <Row
+                            size={40}
+                            style={{
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                            }}>
+                            <Text
+                              style={[
+                                styles.toggleText,
+                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[0].key)
+                                  ? styles.activeToggleText
+                                  : styles.inactiveToggleText,
+                              ]}>
+                              {
+                                this.state.progressCircleFromWeb[0].label
+                              }
+                            </Text>
+                          </Row>
+                        </Col>
+                      </Row>
+                    </Col>
+                    <Col size={3}></Col>
+                  </Row>
+
+                  <Row size={1}></Row>
+                  <Row size={1}></Row>
+                  
+                  <Row size={1}>
+                    <Col size={1}>
+                      <Row size={1}>
+                        <Col>
+                          <Row size={60}>
+                            <Col>
+                              <TouchableOpacity
+                                onPress={() => {
+                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[1].key);
+                                }}
+                                activeOpacity={1}>
+                                <Image
+                                  source={{
+                                    uri: this.state.progressCircleFromWeb[1].image
+                                  }}
+                                  style={
+                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                  }
+                                />
+                              </TouchableOpacity>
+                            </Col>
+                          </Row>
+                          <Row
+                            size={40}
+                            style={{
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                            }}>
+                            <Text
+                              style={[
+                                styles.toggleText,
+                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
+                                  ? styles.activeToggleText
+                                  : styles.inactiveToggleText,
+                              ]}>
+                              {
+                                this.state.progressCircleFromWeb[1].label
+                              }
+                            </Text>
+                          </Row>
+                        </Col>
+                      </Row>
+                    </Col>
+                    <Col size={2}></Col>
+                    <Col size={1}>
+                      <Row size={1}>
+                        <Col>
+                          <Row size={60}>
+                            <Col>
+                              <TouchableOpacity
+                                onPress={() => {
+                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[2].key);
+                                }}
+                                activeOpacity={1}>
+                                <Image
+                                  source={{
+                                    uri: this.state.progressCircleFromWeb[2].image
+                                  }}
+                                  style={
+                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                  }
+                                />
+                              </TouchableOpacity>
+                            </Col>
+                          </Row>
+                          <Row
+                            size={40}
+                            style={{
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                            }}>
+                            <Text
+                              style={[
+                                styles.toggleText,
+                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
+                                  ? styles.activeToggleText
+                                  : styles.inactiveToggleText,
+                              ]}>
+                              {
+                                this.state.progressCircleFromWeb[2].label
+                              }
+                            </Text>
+                          </Row>
+                        </Col>
+                      </Row>
+                    </Col>
+                    <Col size={2}></Col>
+                    <Col size={1}>
+                      <Row size={1}>
+                        <Col>
+                          <Row size={60}>
+                            <Col>
+                              <TouchableOpacity
+                                onPress={() => {
+                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[3].key);
+                                }}
+                                activeOpacity={1}>
+                                <Image
+                                  source={{
+                                    uri: this.state.progressCircleFromWeb[3].image
+                                  }}
+                                  style={
+                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                  }
+                                />
+                              </TouchableOpacity>
+                            </Col>
+                          </Row>
+                          <Row
+                            size={40}
+                            style={{
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                            }}>
+                            <Text
+                              style={[
+                                styles.toggleText,
+                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
+                                  ? styles.activeToggleText
+                                  : styles.inactiveToggleText,
+                              ]}>
+                              {
+                                this.state.progressCircleFromWeb[3].label
+                              }
+                            </Text>
+                          </Row>
+                        </Col>
+                      </Row>
+                    </Col>
+                  </Row>
+
+                  <Row size={1}></Row>
+                  <Row size={1}></Row>
+
+                  <Row size={1}>
+                    <Col size={3}></Col>
+                    <Col size={1}>
+                      <Row size={1}>
+                        <Col>
+                          <Row size={60}>
+                            <Col>
+                              <TouchableOpacity
+                                onPress={() => {
+                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[4].key);
+                                }}
+                                activeOpacity={1}>
+                                <Image
+                                  source={{
+                                    uri: this.state.progressCircleFromWeb[4].image
+                                  }}
+                                  style={
+                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                  }
+                                />
+                              </TouchableOpacity>
+                            </Col>
+                          </Row>
+                          <Row
+                            size={40}
+                            style={{
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                            }}>
+                            <Text
+                              style={[
+                                styles.toggleText,
+                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
+                                  ? styles.activeToggleText
+                                  : styles.inactiveToggleText,
+                              ]}>
+                              {
+                                this.state.progressCircleFromWeb[4].label
+                              }
+                            </Text>
+                          </Row>
+                        </Col>
+                      </Row>
+                    </Col>
+                    <Col size={3}></Col>
+                  </Row>
+
+                </Col>
+
+              </Row>
+
+          </Col>
+
+
+          <Col style={{ width: spacing }} />
+        </Row>
+        <Row style={{ height: spacing }} />
+      </Grid>
+    );
+  }
+
   renderHealthMilestones() {
     return (
       <Grid
@@ -3740,6 +7538,7 @@ class GroupDetailScreen extends React.Component {
     if (Object.prototype.hasOwnProperty.call(field, 'post_type')) {
       postType = field.post_type;
     }
+
     switch (valueType) {
       case 'location': {
         if (propExist) {
@@ -3889,7 +7688,7 @@ class GroupDetailScreen extends React.Component {
                   </Label>
                 </Col>
               </Row>
-              {this.renderHealthMilestones()}
+              {this.renderHealthMilestonesTemplateIcons()}
               {this.renderCustomHealthMilestones()}
             </View>
           );
@@ -4351,7 +8150,8 @@ class GroupDetailScreen extends React.Component {
                   </Label>
                 </Col>
               </Row>
-              {this.renderHealthMilestones()}
+              
+              {this.renderHealthMilestonesTemplateIcons()}
               {this.renderCustomHealthMilestones()}
             </View>
           );
