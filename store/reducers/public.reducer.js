@@ -1,6 +1,7 @@
 import { REHYDRATE } from 'redux-persist/lib/constants';
 
-import * as publicActions from '../actions/public.actions';
+import * as actions from '../actions/public.actions';
+import * as userActions from '../actions/user.actions';
 
 const initialState = {
   loading: false,
@@ -22,14 +23,14 @@ export default function publicReducer(state = initialState, action) {
         loading: false,
       };
     }
-    case publicActions.PUBLIC_GET_SITE_SETTINGS_START: {
+    case actions.PUBLIC_GET_SITE_SETTINGS_START: {
       return {
         ...newState,
         settings: {},
         loading: true,
       };
     }
-    case publicActions.PUBLIC_GET_SITE_SETTINGS_SUCCESS: {
+    case actions.PUBLIC_GET_SITE_SETTINGS_SUCCESS: {
       let { settings } = action;
       return {
         ...newState,
@@ -37,27 +38,27 @@ export default function publicReducer(state = initialState, action) {
         loading: false,
       };
     }
-    case publicActions.PUBLIC_GET_SITE_SETTINGS_FAILURE: {
+    case actions.PUBLIC_GET_SITE_SETTINGS_FAILURE: {
       return {
         ...newState,
         error: action.error,
         loading: false,
       };
     }
-    case publicActions.PUBLIC_CLEAR_SITE_SETTINGS: {
+    case actions.PUBLIC_CLEAR_SITE_SETTINGS: {
       return {
         ...newState,
         settings: {},
       };
     }
-    case publicActions.PUBLIC_GET_O365_TOKEN_START: {
+    case actions.PUBLIC_GET_O365_TOKEN_START: {
       return {
         ...newState,
         o365Token: {},
         loading: true,
       };
     }
-    case publicActions.PUBLIC_GET_O365_TOKEN_SUCCESS: {
+    case actions.PUBLIC_GET_O365_TOKEN_SUCCESS: {
       let { o365Token } = action;
       return {
         ...newState,
@@ -65,13 +66,19 @@ export default function publicReducer(state = initialState, action) {
         loading: false,
       };
     }
-    case publicActions.PUBLIC_GET_O365_TOKEN_FAILURE: {
+    case actions.PUBLIC_GET_O365_TOKEN_FAILURE: {
       return {
         ...newState,
         error: action.error,
         loading: false,
       };
     }
+    case userActions.USER_LOGOUT:
+      return {
+        ...newState,
+        settings: {},
+        o365Token: {},
+      };
     default:
       return newState;
   }
