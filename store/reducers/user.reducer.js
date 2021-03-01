@@ -1,5 +1,7 @@
 import * as actions from '../actions/user.actions';
 import { REHYDRATE } from 'redux-persist/lib/constants';
+import * as publicActions from '../actions/public.actions';
+import sharedTools from '../../shared';
 
 const userDataInitialState = {
   domain: null,
@@ -75,6 +77,43 @@ export default function userReducer(state = initialState, action) {
         error: action.error,
         loading: false,
       };
+    case publicActions.PUBLIC_GET_SITE_SETTINGS_SUCCESS: {
+      let { domain } = action;
+      return {
+        ...newState,
+        userData: {
+          ...newState.userData,
+          domain,
+        },
+      };
+    }
+    case publicActions.PUBLIC_GET_O365_TOKEN_SUCCESS: {
+      let { o365Token } = action;
+      let userProfileInfo = sharedTools.decodeO365Token(o365Token.access_token);
+      if (newState.userData.username !== userProfileInfo.email) {
+        state = {
+          ...state,
+          pinCode: {
+            enabled: false,
+            value: null,
+          },
+        };
+      }
+      state = {
+        ...state,
+        userData: {
+          ...newState.userData,
+          token: o365Token.access_token,
+          username: userProfileInfo.email,
+          password: '',
+          displayName: userProfileInfo.name,
+          email: userProfileInfo.email,
+          locale: null,
+          id: null,
+        },
+      };
+      return state;
+    }
     case actions.GET_MY_USER_INFO_SUCCESS:
       return {
         ...newState,

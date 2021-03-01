@@ -233,7 +233,7 @@ class LoginScreen extends React.Component {
       client_id: '',
       scopes: '',
       authorize_uri: '',
-      redirect_uri: '',
+      redirect_uri: ExpoLinking.makeUrl('login'),
       client_secret: '',
       token_uri: '',
       user_logout_uri: '',
@@ -248,7 +248,7 @@ class LoginScreen extends React.Component {
       ...this.state,
       username: props.userData.username || '',
       password: '',
-      domain: props.userData.domain || '192.168.20.2:100/wordpress',
+      domain: props.userData.domain || '',
       domainIsInvalid: false,
       userIsInvalid: false,
       passwordIsInvalid: false,
@@ -486,11 +486,34 @@ class LoginScreen extends React.Component {
           if (this.props.pinCode.enabled) {
             this.toggleShowPIN();
           } else {
-            this.props.loginDispatch(
-              this.props.userData.domain,
-              this.props.userData.username,
-              this.props.userData.password,
-            );
+            if (Object.prototype.hasOwnProperty.call(this.props.o365Token, 'access_token')) {
+              if (
+                this.props.siteSettings.login_settings &&
+                this.props.siteSettings.login_settings.microsoft
+              ) {
+                this.setState(
+                  (prevState) => (
+                    {
+                      o365Credentials: {
+                        ...prevState.o365Credentials,
+                        ...this.props.siteSettings.login_settings.microsoft,
+                      },
+                    },
+                    () => {
+                      this.setState({
+                        showO365View: true,
+                      });
+                    }
+                  ),
+                );
+              }
+            } else {
+              this.props.loginDispatch(
+                this.props.userData.domain,
+                this.props.userData.username,
+                this.props.userData.password,
+              );
+            }
           }
         } else {
           this.setState(
@@ -1033,19 +1056,9 @@ class LoginScreen extends React.Component {
                           }}>
                           <TouchableOpacity
                             onPress={() => {
-                              this.setState(
-                                (prevState) => ({
-                                  o365Credentials: {
-                                    ...prevState.o365Credentials,
-                                    redirect_uri: ExpoLinking.makeUrl('login'),
-                                  },
-                                }),
-                                () => {
-                                  this.setState({
-                                    showO365View: true,
-                                  });
-                                },
-                              );
+                              this.setState({
+                                showO365View: true,
+                              });
                             }}
                             activeOpacity={1}>
                             <Image source={o365ButtonImage}></Image>
