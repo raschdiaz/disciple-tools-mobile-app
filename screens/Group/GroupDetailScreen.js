@@ -125,13 +125,23 @@ const styles = StyleSheet.create({
     opacity: 1,
     height: 30,
     width: 30,
-    position:'absolute',left:0,bottom:0,right:0,top:0,resizeMode:'contain'
+    position: 'absolute',
+    left: 0,
+    bottom: 0,
+    right: 0,
+    top: 0,
+    resizeMode: 'contain',
   },
   inactiveImageIcon: {
     opacity: 0.15,
     height: 30,
     width: 30,
-    position:'absolute',left:0,bottom:0,right:0,top:0,resizeMode:'contain'
+    position: 'absolute',
+    left: 0,
+    bottom: 0,
+    right: 0,
+    top: 0,
+    resizeMode: 'contain',
   },
   toggleText: {
     textAlign: 'center',
@@ -1419,55 +1429,55 @@ class GroupDetailScreen extends React.Component {
 
   onRefresh(groupId, forceRefresh = false) {
     if (!self.state.loading || forceRefresh) {
-
-      fetch('http://192.168.1.10/wordpress/wp-json/dt-public/dt-core/v1/settings', {
+      fetch('https://demo.myarrow.app/wp-json/dt-public/dt-core/v1/settings', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
       })
-      .then(async (response) => {
-        return response.text().then((responseJSON) => {
-          return JSON.parse(responseJSON);
-        });
-      })
-      .then((response) => {
+        .then(async (response) => {
+          return response.text().then((responseJSON) => {
+            return JSON.parse(responseJSON);
+          });
+        })
+        .then((response) => {
+          console.log('response ', response);
 
-        console.log("response ", response)
+          this.state.progressCircleFromWeb = [];
 
-        this.state.progressCircleFromWeb = []
+          if (response.health_metrics) {
+            this.state.iconQuantity = Object.keys(response.health_metrics.default).length;
 
-        if (response.health_metrics){
-          this.state.iconQuantity = Object.keys(response.health_metrics.default).length
+            console.log(
+              'Object.keys(response.health_metrics.default).length ',
+              Object.keys(response.health_metrics.default).length,
+            );
 
-          console.log(this.state.iconQuantity)
+            var keys = Object.keys(response.health_metrics.default);
 
-          var keys = Object.keys(response.health_metrics.default)
+            keys.forEach((element) => {
+              var object = response.health_metrics.default[element];
+              object.key = element;
 
-          keys.forEach(element => {
-            var object = response.health_metrics.default[element]
-            object.key = element
-
-            if(object.image){
-              if(object.image.includes("dt-assets")){
-                object.image = response.health_metrics.url_image_default + object.image
-              } else {
-                object.image = response.health_metrics.url_image_custom + object.image
+              if (object.image) {
+                if (object.image.includes('dt-assets')) {
+                  object.image = response.health_metrics.url_image_default + object.image;
+                } else {
+                  object.image = response.health_metrics.url_image_custom + object.image;
+                }
               }
+
+              this.state.progressCircleFromWeb.push(object);
+            });
+
+            console.log('this.state.progressCircleFromWeb ', this.state.progressCircleFromWeb);
           }
 
-            this.state.progressCircleFromWeb.push(object)
-          });
-
-          console.log("this.state.progressCircleFromWeb ", this.state.progressCircleFromWeb)
-
-        }
-
-        return {
-          status: 200,
-          data: response,
-        };
-      })
+          return {
+            status: 200,
+            data: response,
+          };
+        });
 
       self.getGroupById(groupId);
       self.onRefreshCommentsActivities(groupId, true);
@@ -2776,11 +2786,10 @@ class GroupDetailScreen extends React.Component {
     </View>
   );
 
-  renderHealthMilestonesTemplateIcons(){
+  renderHealthMilestonesTemplateIcons() {
+    console.log('this.state.iconQuantity ', this.state.iconQuantity);
 
-    console.log("this.state.iconQuantity ", this.state.iconQuantity)
-
-    if(this.state.iconQuantity > 0){
+    if (this.state.iconQuantity > 0) {
       switch (this.state.iconQuantity) {
         case 5:
           return this.renderHealthMilestones5Icons();
@@ -2800,21 +2809,20 @@ class GroupDetailScreen extends React.Component {
           return this.renderHealthMilestones12Icons();
       }
     } else {
-      return this.renderHealthMilestones()
+      return this.renderHealthMilestones();
     }
   }
 
-
   renderHealthMilestones12Icons() {
     return (
-      <Grid pointerEvents={this.state.onlyView ? 'none' : 'auto'} style={{ position: 'relative', left: -20 }}>
+      <Grid
+        pointerEvents={this.state.onlyView ? 'none' : 'auto'}
+        style={{ position: 'relative', left: -20 }}>
         <Row style={{ height: spacing }} />
         <Row style={{ height: sideSize }}>
           <Col style={{ width: spacing }} />
 
-
           <Col style={{ width: sideSize }}>
-
             <Image
               source={circleIcon}
               style={{
@@ -2846,8 +2854,7 @@ class GroupDetailScreen extends React.Component {
             />
 
             <Row>
-              <Col style={{margin: 10}}>
-                
+              <Col style={{ margin: 10 }}>
                 <Row size={1}>
                   <Col size={3}></Col>
                   <Col size={1}>
@@ -2862,10 +2869,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[0].image
+                                  uri: this.state.progressCircleFromWeb[0].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[0].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[0].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -2882,13 +2891,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[0].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[0].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[0].label
-                            }
+                            {this.state.progressCircleFromWeb[0].label}
                           </Text>
                         </Row>
                       </Col>
@@ -2896,7 +2905,7 @@ class GroupDetailScreen extends React.Component {
                   </Col>
                   <Col size={3}></Col>
                 </Row>
-                
+
                 <Row size={1}>
                   <Col size={1}></Col>
                   <Col size={1}>
@@ -2911,10 +2920,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[1].image
+                                  uri: this.state.progressCircleFromWeb[1].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[1].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -2931,13 +2942,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[1].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[1].label
-                            }
+                            {this.state.progressCircleFromWeb[1].label}
                           </Text>
                         </Row>
                       </Col>
@@ -2956,10 +2967,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[2].image
+                                  uri: this.state.progressCircleFromWeb[2].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[2].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -2976,13 +2989,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[2].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[2].label
-                            }
+                            {this.state.progressCircleFromWeb[2].label}
                           </Text>
                         </Row>
                       </Col>
@@ -3005,10 +3018,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[3].image
+                                  uri: this.state.progressCircleFromWeb[3].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[3].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -3025,13 +3040,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[3].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[3].label
-                            }
+                            {this.state.progressCircleFromWeb[3].label}
                           </Text>
                         </Row>
                       </Col>
@@ -3050,10 +3065,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[4].image
+                                  uri: this.state.progressCircleFromWeb[4].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[4].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -3070,13 +3087,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[4].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[4].label
-                            }
+                            {this.state.progressCircleFromWeb[4].label}
                           </Text>
                         </Row>
                       </Col>
@@ -3084,7 +3101,7 @@ class GroupDetailScreen extends React.Component {
                   </Col>
                   <Col size={2}></Col>
                 </Row>
-                
+
                 <Row size={1}>
                   <Col size={1}>
                     <Row size={1}>
@@ -3098,10 +3115,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[5].image
+                                  uri: this.state.progressCircleFromWeb[5].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[5].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[5].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -3118,13 +3137,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[5].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[5].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[5].label
-                            }
+                            {this.state.progressCircleFromWeb[5].label}
                           </Text>
                         </Row>
                       </Col>
@@ -3143,10 +3162,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[6].image
+                                  uri: this.state.progressCircleFromWeb[6].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[6].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[6].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -3163,13 +3184,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[6].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[6].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[6].label
-                            }
+                            {this.state.progressCircleFromWeb[6].label}
                           </Text>
                         </Row>
                       </Col>
@@ -3191,10 +3212,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[7].image
+                                  uri: this.state.progressCircleFromWeb[7].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[7].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[7].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -3211,13 +3234,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[7].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[7].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[7].label
-                            }
+                            {this.state.progressCircleFromWeb[7].label}
                           </Text>
                         </Row>
                       </Col>
@@ -3236,10 +3259,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[8].image
+                                  uri: this.state.progressCircleFromWeb[8].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[8].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[8].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -3256,13 +3281,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[8].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[8].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[8].label
-                            }
+                            {this.state.progressCircleFromWeb[8].label}
                           </Text>
                         </Row>
                       </Col>
@@ -3285,10 +3310,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[9].image
+                                  uri: this.state.progressCircleFromWeb[9].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[9].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[9].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -3305,13 +3332,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[9].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[9].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[9].label
-                            }
+                            {this.state.progressCircleFromWeb[9].label}
                           </Text>
                         </Row>
                       </Col>
@@ -3330,10 +3357,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[10].image
+                                  uri: this.state.progressCircleFromWeb[10].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[10].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[10].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -3350,13 +3379,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[10].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[10].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[10].label
-                            }
+                            {this.state.progressCircleFromWeb[10].label}
                           </Text>
                         </Row>
                       </Col>
@@ -3379,10 +3408,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[11].image
+                                  uri: this.state.progressCircleFromWeb[11].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[11].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[11].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -3399,13 +3430,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[11].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[11].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[11].label
-                            }
+                            {this.state.progressCircleFromWeb[11].label}
                           </Text>
                         </Row>
                       </Col>
@@ -3413,12 +3444,9 @@ class GroupDetailScreen extends React.Component {
                   </Col>
                   <Col size={3}></Col>
                 </Row>
-
               </Col>
             </Row>
-
           </Col>
-
 
           <Col style={{ width: spacing }} />
         </Row>
@@ -3429,14 +3457,14 @@ class GroupDetailScreen extends React.Component {
 
   renderHealthMilestones11Icons() {
     return (
-      <Grid pointerEvents={this.state.onlyView ? 'none' : 'auto'} style={{ position: 'relative', left: -20 }}>
+      <Grid
+        pointerEvents={this.state.onlyView ? 'none' : 'auto'}
+        style={{ position: 'relative', left: -20 }}>
         <Row style={{ height: spacing }} />
         <Row style={{ height: sideSize }}>
           <Col style={{ width: spacing }} />
 
-
           <Col style={{ width: sideSize }}>
-
             <Image
               source={circleIcon}
               style={{
@@ -3467,10 +3495,8 @@ class GroupDetailScreen extends React.Component {
               }}
             />
 
-
             <Row>
-              <Col style={{margin: 10}}>
-                
+              <Col style={{ margin: 10 }}>
                 <Row size={1}>
                   <Col size={3}></Col>
                   <Col size={1}>
@@ -3485,10 +3511,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[0].image
+                                  uri: this.state.progressCircleFromWeb[0].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[0].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[0].key,
+                                  )
                                     ? styles.activeImage
                                     : styles.inactiveImage
                                 }
@@ -3505,13 +3533,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[0].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[0].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[0].label
-                            }
+                            {this.state.progressCircleFromWeb[0].label}
                           </Text>
                         </Row>
                       </Col>
@@ -3519,7 +3547,7 @@ class GroupDetailScreen extends React.Component {
                   </Col>
                   <Col size={3}></Col>
                 </Row>
-                
+
                 <Row size={1}>
                   <Col size={1}></Col>
                   <Col size={1}>
@@ -3534,10 +3562,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[1].image
+                                  uri: this.state.progressCircleFromWeb[1].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[1].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -3554,13 +3584,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[1].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[1].label
-                            }
+                            {this.state.progressCircleFromWeb[1].label}
                           </Text>
                         </Row>
                       </Col>
@@ -3579,10 +3609,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[2].image
+                                  uri: this.state.progressCircleFromWeb[2].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[2].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -3599,13 +3631,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[2].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[2].label
-                            }
+                            {this.state.progressCircleFromWeb[2].label}
                           </Text>
                         </Row>
                       </Col>
@@ -3628,10 +3660,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[3].image
+                                  uri: this.state.progressCircleFromWeb[3].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[3].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -3648,13 +3682,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[3].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[3].label
-                            }
+                            {this.state.progressCircleFromWeb[3].label}
                           </Text>
                         </Row>
                       </Col>
@@ -3673,10 +3707,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[4].image
+                                  uri: this.state.progressCircleFromWeb[4].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[4].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -3693,13 +3729,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[4].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[4].label
-                            }
+                            {this.state.progressCircleFromWeb[4].label}
                           </Text>
                         </Row>
                       </Col>
@@ -3707,7 +3743,7 @@ class GroupDetailScreen extends React.Component {
                   </Col>
                   <Col size={2}></Col>
                 </Row>
-                
+
                 <Row size={1}>
                   <Col size={3}></Col>
                   <Col size={1}>
@@ -3722,10 +3758,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[5].image
+                                  uri: this.state.progressCircleFromWeb[5].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[5].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[5].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -3742,13 +3780,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[5].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[5].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[5].label
-                            }
+                            {this.state.progressCircleFromWeb[5].label}
                           </Text>
                         </Row>
                       </Col>
@@ -3771,10 +3809,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[6].image
+                                  uri: this.state.progressCircleFromWeb[6].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[6].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[6].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -3791,13 +3831,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[6].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[6].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[6].label
-                            }
+                            {this.state.progressCircleFromWeb[6].label}
                           </Text>
                         </Row>
                       </Col>
@@ -3816,10 +3856,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[7].image
+                                  uri: this.state.progressCircleFromWeb[7].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[7].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[7].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -3836,13 +3878,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[7].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[7].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[7].label
-                            }
+                            {this.state.progressCircleFromWeb[7].label}
                           </Text>
                         </Row>
                       </Col>
@@ -3865,10 +3907,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[8].image
+                                  uri: this.state.progressCircleFromWeb[8].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[8].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[8].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -3885,13 +3929,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[8].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[8].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[8].label
-                            }
+                            {this.state.progressCircleFromWeb[8].label}
                           </Text>
                         </Row>
                       </Col>
@@ -3910,10 +3954,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[9].image
+                                  uri: this.state.progressCircleFromWeb[9].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[9].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[9].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -3930,13 +3976,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[9].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[9].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[9].label
-                            }
+                            {this.state.progressCircleFromWeb[9].label}
                           </Text>
                         </Row>
                       </Col>
@@ -3959,10 +4005,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[10].image
+                                  uri: this.state.progressCircleFromWeb[10].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[10].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[10].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -3979,13 +4027,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[10].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[10].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[10].label
-                            }
+                            {this.state.progressCircleFromWeb[10].label}
                           </Text>
                         </Row>
                       </Col>
@@ -3993,12 +4041,9 @@ class GroupDetailScreen extends React.Component {
                   </Col>
                   <Col size={3}></Col>
                 </Row>
-
               </Col>
             </Row>
-
           </Col>
-
 
           <Col style={{ width: spacing }} />
         </Row>
@@ -4009,14 +4054,14 @@ class GroupDetailScreen extends React.Component {
 
   renderHealthMilestones10Icons() {
     return (
-      <Grid pointerEvents={this.state.onlyView ? 'none' : 'auto'} style={{ position: 'relative', left: -20 }}>
+      <Grid
+        pointerEvents={this.state.onlyView ? 'none' : 'auto'}
+        style={{ position: 'relative', left: -20 }}>
         <Row style={{ height: spacing }} />
         <Row style={{ height: sideSize }}>
           <Col style={{ width: spacing }} />
 
-
           <Col style={{ width: sideSize }}>
-
             <Image
               source={circleIcon}
               style={{
@@ -4048,8 +4093,7 @@ class GroupDetailScreen extends React.Component {
             />
 
             <Row>
-              <Col style={{margin: 10}}>
-                
+              <Col style={{ margin: 10 }}>
                 <Row size={1}>
                   <Col size={3}></Col>
                   <Col size={1}>
@@ -4065,10 +4109,12 @@ class GroupDetailScreen extends React.Component {
                               <Image
                                 source={{
                                   // uri: "http://192.168.1.10/wordpress/wp-content/uploads/2021/02/icon.jpeg"
-                                  uri: this.state.progressCircleFromWeb[0].image
+                                  uri: this.state.progressCircleFromWeb[0].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[0].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[0].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -4085,13 +4131,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[1].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[0].label
-                            }
+                            {this.state.progressCircleFromWeb[0].label}
                           </Text>
                         </Row>
                       </Col>
@@ -4099,7 +4145,7 @@ class GroupDetailScreen extends React.Component {
                   </Col>
                   <Col size={3}></Col>
                 </Row>
-                
+
                 <Row size={1}>
                   <Col size={1}></Col>
                   <Col size={1}>
@@ -4114,10 +4160,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[1].image
+                                  uri: this.state.progressCircleFromWeb[1].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[1].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -4134,13 +4182,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[1].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[1].label
-                            }
+                            {this.state.progressCircleFromWeb[1].label}
                           </Text>
                         </Row>
                       </Col>
@@ -4159,10 +4207,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[2].image
+                                  uri: this.state.progressCircleFromWeb[2].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[2].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -4179,13 +4229,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[2].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[2].label
-                            }
+                            {this.state.progressCircleFromWeb[2].label}
                           </Text>
                         </Row>
                       </Col>
@@ -4208,10 +4258,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[3].image
+                                  uri: this.state.progressCircleFromWeb[3].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[3].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -4228,13 +4280,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[3].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[3].label
-                            }
+                            {this.state.progressCircleFromWeb[3].label}
                           </Text>
                         </Row>
                       </Col>
@@ -4253,10 +4305,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[4].image
+                                  uri: this.state.progressCircleFromWeb[4].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[4].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -4273,13 +4327,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[4].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[4].label
-                            }
+                            {this.state.progressCircleFromWeb[4].label}
                           </Text>
                         </Row>
                       </Col>
@@ -4287,7 +4341,7 @@ class GroupDetailScreen extends React.Component {
                   </Col>
                   <Col size={2}></Col>
                 </Row>
-                
+
                 <Row size={1}>
                   <Col size={7}></Col>
                 </Row>
@@ -4306,10 +4360,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[5].image
+                                  uri: this.state.progressCircleFromWeb[5].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[5].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[5].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -4326,13 +4382,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[5].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[5].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[5].label
-                            }
+                            {this.state.progressCircleFromWeb[5].label}
                           </Text>
                         </Row>
                       </Col>
@@ -4351,10 +4407,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[6].image
+                                  uri: this.state.progressCircleFromWeb[6].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[6].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[6].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -4371,13 +4429,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[6].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[6].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[6].label
-                            }
+                            {this.state.progressCircleFromWeb[6].label}
                           </Text>
                         </Row>
                       </Col>
@@ -4400,10 +4458,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[7].image
+                                  uri: this.state.progressCircleFromWeb[7].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[7].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[7].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -4420,13 +4480,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[7].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[7].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[7].label
-                            }
+                            {this.state.progressCircleFromWeb[7].label}
                           </Text>
                         </Row>
                       </Col>
@@ -4445,10 +4505,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[8].image
+                                  uri: this.state.progressCircleFromWeb[8].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[8].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[8].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -4465,13 +4527,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[8].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[8].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[8].label
-                            }
+                            {this.state.progressCircleFromWeb[8].label}
                           </Text>
                         </Row>
                       </Col>
@@ -4494,10 +4556,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[9].image
+                                  uri: this.state.progressCircleFromWeb[9].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[9].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[9].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -4514,13 +4578,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[9].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[9].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[9].label
-                            }
+                            {this.state.progressCircleFromWeb[9].label}
                           </Text>
                         </Row>
                       </Col>
@@ -4528,12 +4592,9 @@ class GroupDetailScreen extends React.Component {
                   </Col>
                   <Col size={3}></Col>
                 </Row>
-
               </Col>
             </Row>
-
           </Col>
-
 
           <Col style={{ width: spacing }} />
         </Row>
@@ -4544,14 +4605,14 @@ class GroupDetailScreen extends React.Component {
 
   renderHealthMilestones9Icons() {
     return (
-      <Grid pointerEvents={this.state.onlyView ? 'none' : 'auto'} style={{ position: 'relative', left: -20 }}>
+      <Grid
+        pointerEvents={this.state.onlyView ? 'none' : 'auto'}
+        style={{ position: 'relative', left: -20 }}>
         <Row style={{ height: spacing }} />
         <Row style={{ height: sideSize }}>
           <Col style={{ width: spacing }} />
 
-
           <Col style={{ width: sideSize }}>
-
             <Image
               source={circleIcon}
               style={{
@@ -4583,8 +4644,7 @@ class GroupDetailScreen extends React.Component {
             />
 
             <Row>
-              <Col style={{margin: 10}}>
-                
+              <Col style={{ margin: 10 }}>
                 <Row size={1}>
                   <Col size={3}></Col>
                   <Col size={1}>
@@ -4599,10 +4659,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[0].image
+                                  uri: this.state.progressCircleFromWeb[0].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[0].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[0].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -4619,13 +4681,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[0].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[0].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[0].label
-                            }
+                            {this.state.progressCircleFromWeb[0].label}
                           </Text>
                         </Row>
                       </Col>
@@ -4633,7 +4695,7 @@ class GroupDetailScreen extends React.Component {
                   </Col>
                   <Col size={3}></Col>
                 </Row>
-                
+
                 <Row size={1}>
                   <Col size={1}></Col>
                   <Col size={1}>
@@ -4648,10 +4710,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[1].image
+                                  uri: this.state.progressCircleFromWeb[1].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[1].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -4668,13 +4732,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[1].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[1].label
-                            }
+                            {this.state.progressCircleFromWeb[1].label}
                           </Text>
                         </Row>
                       </Col>
@@ -4693,10 +4757,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[2].image
+                                  uri: this.state.progressCircleFromWeb[2].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[2].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -4713,13 +4779,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[2].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[2].label
-                            }
+                            {this.state.progressCircleFromWeb[2].label}
                           </Text>
                         </Row>
                       </Col>
@@ -4729,7 +4795,7 @@ class GroupDetailScreen extends React.Component {
                 </Row>
 
                 <Row size={1}></Row>
-                
+
                 <Row size={1}>
                   <Col size={1}>
                     <Row size={1}>
@@ -4743,10 +4809,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[3].image
+                                  uri: this.state.progressCircleFromWeb[3].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[3].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -4763,13 +4831,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[3].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[3].label
-                            }
+                            {this.state.progressCircleFromWeb[3].label}
                           </Text>
                         </Row>
                       </Col>
@@ -4788,10 +4856,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[4].image
+                                  uri: this.state.progressCircleFromWeb[4].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[4].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -4808,13 +4878,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[4].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[4].label
-                            }
+                            {this.state.progressCircleFromWeb[4].label}
                           </Text>
                         </Row>
                       </Col>
@@ -4833,10 +4903,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[5].image
+                                  uri: this.state.progressCircleFromWeb[5].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[5].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[5].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -4853,13 +4925,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[5].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[5].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[5].label
-                            }
+                            {this.state.progressCircleFromWeb[5].label}
                           </Text>
                         </Row>
                       </Col>
@@ -4883,10 +4955,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[6].image
+                                  uri: this.state.progressCircleFromWeb[6].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[6].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[6].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -4903,13 +4977,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[6].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[6].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[6].label
-                            }
+                            {this.state.progressCircleFromWeb[6].label}
                           </Text>
                         </Row>
                       </Col>
@@ -4928,10 +5002,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[7].image
+                                  uri: this.state.progressCircleFromWeb[7].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[7].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[7].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -4948,13 +5024,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[7].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[7].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[7].label
-                            }
+                            {this.state.progressCircleFromWeb[7].label}
                           </Text>
                         </Row>
                       </Col>
@@ -4977,10 +5053,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[8].image
+                                  uri: this.state.progressCircleFromWeb[8].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[8].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[8].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -4997,13 +5075,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[8].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[8].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[8].label
-                            }
+                            {this.state.progressCircleFromWeb[8].label}
                           </Text>
                         </Row>
                       </Col>
@@ -5011,12 +5089,9 @@ class GroupDetailScreen extends React.Component {
                   </Col>
                   <Col size={3}></Col>
                 </Row>
-
               </Col>
             </Row>
-          
           </Col>
-
 
           <Col style={{ width: spacing }} />
         </Row>
@@ -5027,14 +5102,14 @@ class GroupDetailScreen extends React.Component {
 
   renderHealthMilestones8Icons() {
     return (
-      <Grid pointerEvents={this.state.onlyView ? 'none' : 'auto'} style={{ position: 'relative', left: -20 }}>
+      <Grid
+        pointerEvents={this.state.onlyView ? 'none' : 'auto'}
+        style={{ position: 'relative', left: -20 }}>
         <Row style={{ height: spacing }} />
         <Row style={{ height: sideSize }}>
           <Col style={{ width: spacing }} />
 
-
           <Col style={{ width: sideSize }}>
-
             <Image
               source={circleIcon}
               style={{
@@ -5066,8 +5141,7 @@ class GroupDetailScreen extends React.Component {
             />
 
             <Row>
-              <Col style={{margin: 10}}>
-                
+              <Col style={{ margin: 10 }}>
                 <Row size={1}>
                   <Col size={3}></Col>
                   <Col size={1}>
@@ -5082,10 +5156,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[0].image
+                                  uri: this.state.progressCircleFromWeb[0].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[0].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[0].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -5102,13 +5178,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[0].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[0].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[0].label
-                            }
+                            {this.state.progressCircleFromWeb[0].label}
                           </Text>
                         </Row>
                       </Col>
@@ -5116,7 +5192,7 @@ class GroupDetailScreen extends React.Component {
                   </Col>
                   <Col size={3}></Col>
                 </Row>
-                
+
                 <Row size={1}></Row>
 
                 <Row size={1}>
@@ -5133,10 +5209,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[1].image
+                                  uri: this.state.progressCircleFromWeb[1].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[1].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -5153,13 +5231,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[1].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[1].label
-                            }
+                            {this.state.progressCircleFromWeb[1].label}
                           </Text>
                         </Row>
                       </Col>
@@ -5178,10 +5256,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[2].image
+                                  uri: this.state.progressCircleFromWeb[2].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[2].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -5198,13 +5278,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[2].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[2].label
-                            }
+                            {this.state.progressCircleFromWeb[2].label}
                           </Text>
                         </Row>
                       </Col>
@@ -5212,7 +5292,7 @@ class GroupDetailScreen extends React.Component {
                   </Col>
                   <Col size={2}></Col>
                 </Row>
-                
+
                 <Row size={1}>
                   <Col size={1}>
                     <Row size={1}>
@@ -5226,10 +5306,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[3].image
+                                  uri: this.state.progressCircleFromWeb[3].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[3].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -5246,13 +5328,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[3].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[3].label
-                            }
+                            {this.state.progressCircleFromWeb[3].label}
                           </Text>
                         </Row>
                       </Col>
@@ -5271,10 +5353,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[4].image
+                                  uri: this.state.progressCircleFromWeb[4].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[4].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -5291,13 +5375,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[4].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[4].label
-                            }
+                            {this.state.progressCircleFromWeb[4].label}
                           </Text>
                         </Row>
                       </Col>
@@ -5319,10 +5403,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[5].image
+                                  uri: this.state.progressCircleFromWeb[5].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[5].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[5].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -5339,13 +5425,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[5].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[5].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[5].label
-                            }
+                            {this.state.progressCircleFromWeb[5].label}
                           </Text>
                         </Row>
                       </Col>
@@ -5364,10 +5450,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[6].image
+                                  uri: this.state.progressCircleFromWeb[6].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[6].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[6].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -5384,13 +5472,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[6].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[6].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[6].label
-                            }
+                            {this.state.progressCircleFromWeb[6].label}
                           </Text>
                         </Row>
                       </Col>
@@ -5398,7 +5486,7 @@ class GroupDetailScreen extends React.Component {
                   </Col>
                   <Col size={2}></Col>
                 </Row>
-                
+
                 <Row size={1}></Row>
 
                 <Row size={1}>
@@ -5415,10 +5503,12 @@ class GroupDetailScreen extends React.Component {
                               activeOpacity={1}>
                               <Image
                                 source={{
-                                  uri: this.state.progressCircleFromWeb[7].image
+                                  uri: this.state.progressCircleFromWeb[7].image,
                                 }}
                                 style={
-                                  this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[7].key)
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[7].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
                                 }
@@ -5435,13 +5525,13 @@ class GroupDetailScreen extends React.Component {
                           <Text
                             style={[
                               styles.toggleText,
-                              this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[7].key)
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[7].key,
+                              )
                                 ? styles.activeToggleText
                                 : styles.inactiveToggleText,
                             ]}>
-                            {
-                              this.state.progressCircleFromWeb[7].label
-                            }
+                            {this.state.progressCircleFromWeb[7].label}
                           </Text>
                         </Row>
                       </Col>
@@ -5449,12 +5539,9 @@ class GroupDetailScreen extends React.Component {
                   </Col>
                   <Col size={3}></Col>
                 </Row>
-
               </Col>
             </Row>
-
           </Col>
-
 
           <Col style={{ width: spacing }} />
         </Row>
@@ -5465,14 +5552,14 @@ class GroupDetailScreen extends React.Component {
 
   renderHealthMilestones7Icons() {
     return (
-      <Grid pointerEvents={this.state.onlyView ? 'none' : 'auto'} style={{ position: 'relative', left: -20 }}>
+      <Grid
+        pointerEvents={this.state.onlyView ? 'none' : 'auto'}
+        style={{ position: 'relative', left: -20 }}>
         <Row style={{ height: spacing }} />
         <Row style={{ height: sideSize }}>
           <Col style={{ width: spacing }} />
 
-
           <Col style={{ width: sideSize }}>
-
             <Image
               source={circleIcon}
               style={{
@@ -5503,356 +5590,363 @@ class GroupDetailScreen extends React.Component {
               }}
             />
 
-
-              <Row>
-
-                <Col style={{margin: 10}}>
-                  
-                  <Row size={1}>
-                    <Col size={3}></Col>
-                    <Col size={1}>
-                      <Row size={1}>
-                        <Col>
-                          <Row size={60}>
-                            <Col>
-                              <TouchableOpacity
-                                onPress={() => {
-                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[0].key);
+            <Row>
+              <Col style={{ margin: 10 }}>
+                <Row size={1}>
+                  <Col size={3}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[0].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[0].image,
                                 }}
-                                activeOpacity={1}>
-                                <Image
-                                  source={{
-                                    uri: this.state.progressCircleFromWeb[0].image
-                                  }}
-                                  style={
-                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[0].key)
-                                      ? styles.activeImageIcon
-                                      : styles.inactiveImageIcon
-                                  }
-                                />
-                              </TouchableOpacity>
-                            </Col>
-                          </Row>
-                          <Row
-                            size={40}
-                            style={{
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                            }}>
-                            <Text
-                              style={[
-                                styles.toggleText,
-                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[0].key)
-                                  ? styles.activeToggleText
-                                  : styles.inactiveToggleText,
-                              ]}>
-                              {
-                                this.state.progressCircleFromWeb[0].label
-                              }
-                            </Text>
-                          </Row>
-                        </Col>
-                      </Row>
-                    </Col>
-                    <Col size={3}></Col>
-                  </Row>
-                  
-                  <Row size={1}>
-                    <Col size={1}></Col>
-                    <Col size={1}>
-                      <Row size={1}>
-                        <Col>
-                          <Row size={60}>
-                            <Col>
-                              <TouchableOpacity
-                                onPress={() => {
-                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[1].key);
+                                style={
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[0].key,
+                                  )
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[0].key,
+                              )
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {this.state.progressCircleFromWeb[0].label}
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={3}></Col>
+                </Row>
+
+                <Row size={1}>
+                  <Col size={1}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[1].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[1].image,
                                 }}
-                                activeOpacity={1}>
-                                <Image
-                                  source={{
-                                    uri: this.state.progressCircleFromWeb[1].image
-                                  }}
-                                  style={
-                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
-                                      ? styles.activeImageIcon
-                                      : styles.inactiveImageIcon
-                                  }
-                                />
-                              </TouchableOpacity>
-                            </Col>
-                          </Row>
-                          <Row
-                            size={40}
-                            style={{
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                            }}>
-                            <Text
-                              style={[
-                                styles.toggleText,
-                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
-                                  ? styles.activeToggleText
-                                  : styles.inactiveToggleText,
-                              ]}>
-                              {
-                                this.state.progressCircleFromWeb[1].label
-                              }
-                            </Text>
-                          </Row>
-                        </Col>
-                      </Row>
-                    </Col>
-                    <Col size={3}></Col>
-                    <Col size={1}>
-                      <Row size={1}>
-                        <Col>
-                          <Row size={60}>
-                            <Col>
-                              <TouchableOpacity
-                                onPress={() => {
-                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[2].key);
+                                style={
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[1].key,
+                                  )
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[1].key,
+                              )
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {this.state.progressCircleFromWeb[1].label}
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={3}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[2].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[2].image,
                                 }}
-                                activeOpacity={1}>
-                                <Image
-                                  source={{
-                                    uri: this.state.progressCircleFromWeb[2].image
-                                  }}
-                                  style={
-                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
-                                      ? styles.activeImageIcon
-                                      : styles.inactiveImageIcon
-                                  }
-                                />
-                              </TouchableOpacity>
-                            </Col>
-                          </Row>
-                          <Row
-                            size={40}
-                            style={{
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                            }}>
-                            <Text
-                              style={[
-                                styles.toggleText,
-                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
-                                  ? styles.activeToggleText
-                                  : styles.inactiveToggleText,
-                              ]}>
-                              {
-                                this.state.progressCircleFromWeb[2].label
-                              }
-                            </Text>
-                          </Row>
-                        </Col>
-                      </Row>
-                    </Col>
-                    <Col size={1}></Col>
-                  </Row>
+                                style={
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[2].key,
+                                  )
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[2].key,
+                              )
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {this.state.progressCircleFromWeb[2].label}
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={1}></Col>
+                </Row>
 
-                  <Row size={1}></Row>
-                  
-                  <Row size={1}>
-                    <Col size={3}></Col>
-                    <Col size={1}>
-                      <Row size={1}>
-                        <Col>
-                          <Row size={60}>
-                            <Col>
-                              <TouchableOpacity
-                                onPress={() => {
-                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[3].key);
+                <Row size={1}></Row>
+
+                <Row size={1}>
+                  <Col size={3}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[3].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[3].image,
                                 }}
-                                activeOpacity={1}>
-                                <Image
-                                  source={{
-                                    uri: this.state.progressCircleFromWeb[3].image
-                                  }}
-                                  style={
-                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
-                                      ? styles.activeImageIcon
-                                      : styles.inactiveImageIcon
-                                  }
-                                />
-                              </TouchableOpacity>
-                            </Col>
-                          </Row>
-                          <Row
-                            size={40}
-                            style={{
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                            }}>
-                            <Text
-                              style={[
-                                styles.toggleText,
-                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
-                                  ? styles.activeToggleText
-                                  : styles.inactiveToggleText,
-                              ]}>
-                              {
-                                this.state.progressCircleFromWeb[3].key.label
-                              }
-                            </Text>
-                          </Row>
-                        </Col>
-                      </Row>
-                    </Col>
-                    <Col size={3}></Col>
-                  </Row>
+                                style={
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[3].key,
+                                  )
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[3].key,
+                              )
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {this.state.progressCircleFromWeb[3].key.label}
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={3}></Col>
+                </Row>
 
-                  <Row size={1}></Row>
+                <Row size={1}></Row>
 
-                  <Row size={1}>
-                    <Col size={1}></Col>
-                    <Col size={1}>
-                      <Row size={1}>
-                        <Col>
-                          <Row size={60}>
-                            <Col>
-                              <TouchableOpacity
-                                onPress={() => {
-                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[4].key);
+                <Row size={1}>
+                  <Col size={1}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[4].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[4].image,
                                 }}
-                                activeOpacity={1}>
-                                <Image
-                                  source={{
-                                    uri: this.state.progressCircleFromWeb[4].image
-                                  }}
-                                  style={
-                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
-                                      ? styles.activeImageIcon
-                                      : styles.inactiveImageIcon
-                                  }
-                                />
-                              </TouchableOpacity>
-                            </Col>
-                          </Row>
-                          <Row
-                            size={40}
-                            style={{
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                            }}>
-                            <Text
-                              style={[
-                                styles.toggleText,
-                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
-                                  ? styles.activeToggleText
-                                  : styles.inactiveToggleText,
-                              ]}>
-                              {
-                                this.state.progressCircleFromWeb[4].label
-                              }
-                            </Text>
-                          </Row>
-                        </Col>
-                      </Row>
-                    </Col>
-                    <Col size={3}></Col>
-                    <Col size={1}>
-                      <Row size={1}>
-                        <Col>
-                          <Row size={60}>
-                            <Col>
-                              <TouchableOpacity
-                                onPress={() => {
-                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[5].key);
+                                style={
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[4].key,
+                                  )
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[4].key,
+                              )
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {this.state.progressCircleFromWeb[4].label}
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={3}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[5].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[5].image,
                                 }}
-                                activeOpacity={1}>
-                                <Image
-                                  source={{
-                                    uri: this.state.progressCircleFromWeb[5].image
-                                  }}
-                                  style={
-                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[5].key)
-                                      ? styles.activeImageIcon
-                                      : styles.inactiveImageIcon
-                                  }
-                                />
-                              </TouchableOpacity>
-                            </Col>
-                          </Row>
-                          <Row
-                            size={40}
-                            style={{
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                            }}>
-                            <Text
-                              style={[
-                                styles.toggleText,
-                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[5].key)
-                                  ? styles.activeToggleText
-                                  : styles.inactiveToggleText,
-                              ]}>
-                              {
-                                this.state.progressCircleFromWeb[5].label
-                              }
-                            </Text>
-                          </Row>
-                        </Col>
-                      </Row>
-                    </Col>
-                    <Col size={1}></Col>
-                  </Row>
+                                style={
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[5].key,
+                                  )
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[5].key,
+                              )
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {this.state.progressCircleFromWeb[5].label}
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={1}></Col>
+                </Row>
 
-                  <Row size={1}>
-                    <Col size={3}></Col>
-                    <Col size={1}>
-                      <Row size={1}>
-                        <Col>
-                          <Row size={60}>
-                            <Col>
-                              <TouchableOpacity
-                                onPress={() => {
-                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[6].key);
+                <Row size={1}>
+                  <Col size={3}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[6].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[6].image,
                                 }}
-                                activeOpacity={1}>
-                                <Image
-                                  source={{
-                                    uri: this.state.progressCircleFromWeb[6].image
-                                  }}
-                                  style={
-                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[6].key)
-                                      ? styles.activeImageIcon
-                                      : styles.inactiveImageIcon
-                                  }
-                                />
-                              </TouchableOpacity>
-                            </Col>
-                          </Row>
-                          <Row
-                            size={40}
-                            style={{
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                            }}>
-                            <Text
-                              style={[
-                                styles.toggleText,
-                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[6].key)
-                                  ? styles.activeToggleText
-                                  : styles.inactiveToggleText,
-                              ]}>
-                              {
-                                this.state.progressCircleFromWeb[6].label
-                              }
-                            </Text>
-                          </Row>
-                        </Col>
-                      </Row>
-                    </Col>
-                    <Col size={3}></Col>
-                  </Row>
-
-                </Col>
-
-              </Row>
-
+                                style={
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[6].key,
+                                  )
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[6].key,
+                              )
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {this.state.progressCircleFromWeb[6].label}
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={3}></Col>
+                </Row>
+              </Col>
+            </Row>
           </Col>
-
 
           <Col style={{ width: spacing }} />
         </Row>
@@ -5863,14 +5957,14 @@ class GroupDetailScreen extends React.Component {
 
   renderHealthMilestones6Icons() {
     return (
-      <Grid pointerEvents={this.state.onlyView ? 'none' : 'auto'} style={{ position: 'relative', left: -20 }}>
+      <Grid
+        pointerEvents={this.state.onlyView ? 'none' : 'auto'}
+        style={{ position: 'relative', left: -20 }}>
         <Row style={{ height: spacing }} />
         <Row style={{ height: sideSize }}>
           <Col style={{ width: spacing }} />
 
-
           <Col style={{ width: sideSize }}>
-
             <Image
               source={circleIcon}
               style={{
@@ -5901,307 +5995,312 @@ class GroupDetailScreen extends React.Component {
               }}
             />
 
-
-              <Row>
-
-                <Col style={{margin: 10}}>
-                  
-                  <Row size={1}>
-                    <Col size={3}></Col>
-                    <Col size={1}>
-                      <Row size={1}>
-                        <Col>
-                          <Row size={60}>
-                            <Col>
-                              <TouchableOpacity
-                                onPress={() => {
-                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[0].key);
+            <Row>
+              <Col style={{ margin: 10 }}>
+                <Row size={1}>
+                  <Col size={3}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[0].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[0].image,
                                 }}
-                                activeOpacity={1}>
-                                <Image
-                                  source={{
-                                    uri: this.state.progressCircleFromWeb[0].image
-                                  }}
-                                  style={
-                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[0].key)
-                                      ? styles.activeImageIcon
-                                      : styles.inactiveImageIcon
-                                  }
-                                />
-                              </TouchableOpacity>
-                            </Col>
-                          </Row>
-                          <Row
-                            size={40}
-                            style={{
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                            }}>
-                            <Text
-                              style={[
-                                styles.toggleText,
-                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[0].key)
-                                  ? styles.activeToggleText
-                                  : styles.inactiveToggleText,
-                              ]}>
-                              {
-                                this.state.progressCircleFromWeb[0].label
-                              }
-                            </Text>
-                          </Row>
-                        </Col>
-                      </Row>
-                    </Col>
-                    <Col size={3}></Col>
-                  </Row>
-                  
-                  <Row size={1}>
-                    <Col size={1}></Col>
-                    <Col size={1}>
-                      <Row size={1}>
-                        <Col>
-                          <Row size={60}>
-                            <Col>
-                              <TouchableOpacity
-                                onPress={() => {
-                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[1].key);
+                                style={
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[0].key,
+                                  )
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[0].key,
+                              )
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {this.state.progressCircleFromWeb[0].label}
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={3}></Col>
+                </Row>
+
+                <Row size={1}>
+                  <Col size={1}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[1].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[1].image,
                                 }}
-                                activeOpacity={1}>
-                                <Image
-                                  source={{
-                                    uri: this.state.progressCircleFromWeb[1].image
-                                  }}
-                                  style={
-                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
-                                      ? styles.activeImageIcon
-                                      : styles.inactiveImageIcon
-                                  }
-                                />
-                              </TouchableOpacity>
-                            </Col>
-                          </Row>
-                          <Row
-                            size={40}
-                            style={{
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                            }}>
-                            <Text
-                              style={[
-                                styles.toggleText,
-                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
-                                  ? styles.activeToggleText
-                                  : styles.inactiveToggleText,
-                              ]}>
-                              {
-                                this.state.progressCircleFromWeb[1].label
-                              }
-                            </Text>
-                          </Row>
-                        </Col>
-                      </Row>
-                    </Col>
-                    <Col size={3}></Col>
-                    <Col size={1}>
-                      <Row size={1}>
-                        <Col>
-                          <Row size={60}>
-                            <Col>
-                              <TouchableOpacity
-                                onPress={() => {
-                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[2].key);
+                                style={
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[1].key,
+                                  )
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[1].key,
+                              )
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {this.state.progressCircleFromWeb[1].label}
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={3}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[2].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[2].image,
                                 }}
-                                activeOpacity={1}>
-                                <Image
-                                  source={{
-                                    uri: this.state.progressCircleFromWeb[2].image
-                                  }}
-                                  style={
-                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
-                                      ? styles.activeImageIcon
-                                      : styles.inactiveImageIcon
-                                  }
-                                />
-                              </TouchableOpacity>
-                            </Col>
-                          </Row>
-                          <Row
-                            size={40}
-                            style={{
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                            }}>
-                            <Text
-                              style={[
-                                styles.toggleText,
-                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
-                                  ? styles.activeToggleText
-                                  : styles.inactiveToggleText,
-                              ]}>
-                              {
-                                this.state.progressCircleFromWeb[2].label
-                              }
-                            </Text>
-                          </Row>
-                        </Col>
-                      </Row>
-                    </Col>
-                    <Col size={1}></Col>
-                  </Row>
+                                style={
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[2].key,
+                                  )
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[2].key,
+                              )
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {this.state.progressCircleFromWeb[2].label}
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={1}></Col>
+                </Row>
 
-                  <Row size={1}></Row>
-                  <Row size={1}></Row>
-                  <Row size={1}></Row>
+                <Row size={1}></Row>
+                <Row size={1}></Row>
+                <Row size={1}></Row>
 
-                  <Row size={1}>
-                    <Col size={1}></Col>
-                    <Col size={1}>
-                      <Row size={1}>
-                        <Col>
-                          <Row size={60}>
-                            <Col>
-                              <TouchableOpacity
-                                onPress={() => {
-                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[3].key);
+                <Row size={1}>
+                  <Col size={1}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[3].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[3].image,
                                 }}
-                                activeOpacity={1}>
-                                <Image
-                                  source={{
-                                    uri: this.state.progressCircleFromWeb[3].image
-                                  }}
-                                  style={
-                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
-                                      ? styles.activeImageIcon
-                                      : styles.inactiveImageIcon
-                                  }
-                                />
-                              </TouchableOpacity>
-                            </Col>
-                          </Row>
-                          <Row
-                            size={40}
-                            style={{
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                            }}>
-                            <Text
-                              style={[
-                                styles.toggleText,
-                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
-                                  ? styles.activeToggleText
-                                  : styles.inactiveToggleText,
-                              ]}>
-                              {
-                                this.state.progressCircleFromWeb[3].label
-                              }
-                            </Text>
-                          </Row>
-                        </Col>
-                      </Row>
-                    </Col>
-                    <Col size={3}></Col>
-                    <Col size={1}>
-                      <Row size={1}>
-                        <Col>
-                          <Row size={60}>
-                            <Col>
-                              <TouchableOpacity
-                                onPress={() => {
-                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[4].key);
+                                style={
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[3].key,
+                                  )
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[3].key,
+                              )
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {this.state.progressCircleFromWeb[3].label}
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={3}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[4].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[4].image,
                                 }}
-                                activeOpacity={1}>
-                                <Image
-                                  source={{
-                                    uri: this.state.progressCircleFromWeb[4].image
-                                  }}
-                                  style={
-                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
-                                      ? styles.activeImageIcon
-                                      : styles.inactiveImageIcon
-                                  }
-                                />
-                              </TouchableOpacity>
-                            </Col>
-                          </Row>
-                          <Row
-                            size={40}
-                            style={{
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                            }}>
-                            <Text
-                              style={[
-                                styles.toggleText,
-                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
-                                  ? styles.activeToggleText
-                                  : styles.inactiveToggleText,
-                              ]}>
-                              {
-                                this.state.progressCircleFromWeb[4].label
-                              }
-                            </Text>
-                          </Row>
-                        </Col>
-                      </Row>
-                    </Col>
-                    <Col size={1}></Col>
-                  </Row>
+                                style={
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[4].key,
+                                  )
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[4].key,
+                              )
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {this.state.progressCircleFromWeb[4].label}
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={1}></Col>
+                </Row>
 
-                  <Row size={1}>
-                    <Col size={3}></Col>
-                    <Col size={1}>
-                      <Row size={1}>
-                        <Col>
-                          <Row size={60}>
-                            <Col>
-                              <TouchableOpacity
-                                onPress={() => {
-                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[5].key);
+                <Row size={1}>
+                  <Col size={3}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[5].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[5].image,
                                 }}
-                                activeOpacity={1}>
-                                <Image
-                                  source={{
-                                    uri: this.state.progressCircleFromWeb[5].image
-                                  }}
-                                  style={
-                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[5].key)
-                                      ? styles.activeImageIcon
-                                      : styles.inactiveImageIcon
-                                  }
-                                />
-                              </TouchableOpacity>
-                            </Col>
-                          </Row>
-                          <Row
-                            size={40}
-                            style={{
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                            }}>
-                            <Text
-                              style={[
-                                styles.toggleText,
-                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[5].key)
-                                  ? styles.activeToggleText
-                                  : styles.inactiveToggleText,
-                              ]}>
-                              {
-                                this.state.progressCircleFromWeb[5].label
-                              }
-                            </Text>
-                          </Row>
-                        </Col>
-                      </Row>
-                    </Col>
-                    <Col size={3}></Col>
-                  </Row>
-
-                </Col>
-
-              </Row>
-
+                                style={
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[5].key,
+                                  )
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[5].key,
+                              )
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {this.state.progressCircleFromWeb[5].label}
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={3}></Col>
+                </Row>
+              </Col>
+            </Row>
           </Col>
-
 
           <Col style={{ width: spacing }} />
         </Row>
@@ -6212,14 +6311,14 @@ class GroupDetailScreen extends React.Component {
 
   renderHealthMilestones5Icons() {
     return (
-      <Grid pointerEvents={this.state.onlyView ? 'none' : 'auto'} style={{ position: 'relative', left: -20 }}>
+      <Grid
+        pointerEvents={this.state.onlyView ? 'none' : 'auto'}
+        style={{ position: 'relative', left: -20 }}>
         <Row style={{ height: spacing }} />
         <Row style={{ height: sideSize }}>
           <Col style={{ width: spacing }} />
 
-
           <Col style={{ width: sideSize }}>
-
             <Image
               source={circleIcon}
               style={{
@@ -6250,258 +6349,261 @@ class GroupDetailScreen extends React.Component {
               }}
             />
 
-
-              <Row>
-
-                <Col style={{margin: 10}}>
-                  
-                  <Row size={1}>
-                    <Col size={3}></Col>
-                    <Col size={1}>
-                      <Row size={1}>
-                        <Col>
-                          <Row size={60}>
-                            <Col>
-                              <TouchableOpacity
-                                onPress={() => {
-                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[0].key);
+            <Row>
+              <Col style={{ margin: 10 }}>
+                <Row size={1}>
+                  <Col size={3}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[0].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[0].image,
                                 }}
-                                activeOpacity={1}>
-                                <Image
-                                  source={{
-                                    uri: this.state.progressCircleFromWeb[0].image
-                                  }}
-                                  style={
-                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[0].key)
-                                      ? styles.activeImageIcon
-                                      : styles.inactiveImageIcon
-                                  }
-                                />
-                              </TouchableOpacity>
-                            </Col>
-                          </Row>
-                          <Row
-                            size={40}
-                            style={{
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                            }}>
-                            <Text
-                              style={[
-                                styles.toggleText,
-                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[0].key)
-                                  ? styles.activeToggleText
-                                  : styles.inactiveToggleText,
-                              ]}>
-                              {
-                                this.state.progressCircleFromWeb[0].label
-                              }
-                            </Text>
-                          </Row>
-                        </Col>
-                      </Row>
-                    </Col>
-                    <Col size={3}></Col>
-                  </Row>
-
-                  <Row size={1}></Row>
-                  <Row size={1}></Row>
-                  
-                  <Row size={1}>
-                    <Col size={1}>
-                      <Row size={1}>
-                        <Col>
-                          <Row size={60}>
-                            <Col>
-                              <TouchableOpacity
-                                onPress={() => {
-                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[1].key);
-                                }}
-                                activeOpacity={1}>
-                                <Image
-                                  source={{
-                                    uri: this.state.progressCircleFromWeb[1].image
-                                  }}
-                                  style={
-                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
+                                style={
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[0].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
-                                  }
-                                />
-                              </TouchableOpacity>
-                            </Col>
-                          </Row>
-                          <Row
-                            size={40}
-                            style={{
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                            }}>
-                            <Text
-                              style={[
-                                styles.toggleText,
-                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[1].key)
-                                  ? styles.activeToggleText
-                                  : styles.inactiveToggleText,
-                              ]}>
-                              {
-                                this.state.progressCircleFromWeb[1].label
-                              }
-                            </Text>
-                          </Row>
-                        </Col>
-                      </Row>
-                    </Col>
-                    <Col size={2}></Col>
-                    <Col size={1}>
-                      <Row size={1}>
-                        <Col>
-                          <Row size={60}>
-                            <Col>
-                              <TouchableOpacity
-                                onPress={() => {
-                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[2].key);
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[0].key,
+                              )
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {this.state.progressCircleFromWeb[0].label}
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={3}></Col>
+                </Row>
+
+                <Row size={1}></Row>
+                <Row size={1}></Row>
+
+                <Row size={1}>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[1].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[1].image,
                                 }}
-                                activeOpacity={1}>
-                                <Image
-                                  source={{
-                                    uri: this.state.progressCircleFromWeb[2].image
-                                  }}
-                                  style={
-                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
+                                style={
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[1].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
-                                  }
-                                />
-                              </TouchableOpacity>
-                            </Col>
-                          </Row>
-                          <Row
-                            size={40}
-                            style={{
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                            }}>
-                            <Text
-                              style={[
-                                styles.toggleText,
-                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[2].key)
-                                  ? styles.activeToggleText
-                                  : styles.inactiveToggleText,
-                              ]}>
-                              {
-                                this.state.progressCircleFromWeb[2].label
-                              }
-                            </Text>
-                          </Row>
-                        </Col>
-                      </Row>
-                    </Col>
-                    <Col size={2}></Col>
-                    <Col size={1}>
-                      <Row size={1}>
-                        <Col>
-                          <Row size={60}>
-                            <Col>
-                              <TouchableOpacity
-                                onPress={() => {
-                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[3].key);
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[1].key,
+                              )
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {this.state.progressCircleFromWeb[1].label}
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={2}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[2].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[2].image,
                                 }}
-                                activeOpacity={1}>
-                                <Image
-                                  source={{
-                                    uri: this.state.progressCircleFromWeb[3].image
-                                  }}
-                                  style={
-                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
+                                style={
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[2].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
-                                  }
-                                />
-                              </TouchableOpacity>
-                            </Col>
-                          </Row>
-                          <Row
-                            size={40}
-                            style={{
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                            }}>
-                            <Text
-                              style={[
-                                styles.toggleText,
-                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[3].key)
-                                  ? styles.activeToggleText
-                                  : styles.inactiveToggleText,
-                              ]}>
-                              {
-                                this.state.progressCircleFromWeb[3].label
-                              }
-                            </Text>
-                          </Row>
-                        </Col>
-                      </Row>
-                    </Col>
-                  </Row>
-
-                  <Row size={1}></Row>
-                  <Row size={1}></Row>
-
-                  <Row size={1}>
-                    <Col size={3}></Col>
-                    <Col size={1}>
-                      <Row size={1}>
-                        <Col>
-                          <Row size={60}>
-                            <Col>
-                              <TouchableOpacity
-                                onPress={() => {
-                                  this.onHealthMetricChange(this.state.progressCircleFromWeb[4].key);
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[2].key,
+                              )
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {this.state.progressCircleFromWeb[2].label}
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={2}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[3].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[3].image,
                                 }}
-                                activeOpacity={1}>
-                                <Image
-                                  source={{
-                                    uri: this.state.progressCircleFromWeb[4].image
-                                  }}
-                                  style={
-                                    this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
+                                style={
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[3].key,
+                                  )
                                     ? styles.activeImageIcon
                                     : styles.inactiveImageIcon
-                                  }
-                                />
-                              </TouchableOpacity>
-                            </Col>
-                          </Row>
-                          <Row
-                            size={40}
-                            style={{
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                            }}>
-                            <Text
-                              style={[
-                                styles.toggleText,
-                                this.onCheckExistingHealthMetric(this.state.progressCircleFromWeb[4].key)
-                                  ? styles.activeToggleText
-                                  : styles.inactiveToggleText,
-                              ]}>
-                              {
-                                this.state.progressCircleFromWeb[4].label
-                              }
-                            </Text>
-                          </Row>
-                        </Col>
-                      </Row>
-                    </Col>
-                    <Col size={3}></Col>
-                  </Row>
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[3].key,
+                              )
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {this.state.progressCircleFromWeb[3].label}
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                </Row>
 
-                </Col>
+                <Row size={1}></Row>
+                <Row size={1}></Row>
 
-              </Row>
-
+                <Row size={1}>
+                  <Col size={3}></Col>
+                  <Col size={1}>
+                    <Row size={1}>
+                      <Col>
+                        <Row size={60}>
+                          <Col>
+                            <TouchableOpacity
+                              onPress={() => {
+                                this.onHealthMetricChange(this.state.progressCircleFromWeb[4].key);
+                              }}
+                              activeOpacity={1}>
+                              <Image
+                                source={{
+                                  uri: this.state.progressCircleFromWeb[4].image,
+                                }}
+                                style={
+                                  this.onCheckExistingHealthMetric(
+                                    this.state.progressCircleFromWeb[4].key,
+                                  )
+                                    ? styles.activeImageIcon
+                                    : styles.inactiveImageIcon
+                                }
+                              />
+                            </TouchableOpacity>
+                          </Col>
+                        </Row>
+                        <Row
+                          size={40}
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={[
+                              styles.toggleText,
+                              this.onCheckExistingHealthMetric(
+                                this.state.progressCircleFromWeb[4].key,
+                              )
+                                ? styles.activeToggleText
+                                : styles.inactiveToggleText,
+                            ]}>
+                            {this.state.progressCircleFromWeb[4].label}
+                          </Text>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col size={3}></Col>
+                </Row>
+              </Col>
+            </Row>
           </Col>
-
 
           <Col style={{ width: spacing }} />
         </Row>
@@ -8150,7 +8252,7 @@ class GroupDetailScreen extends React.Component {
                   </Label>
                 </Col>
               </Row>
-              
+
               {this.renderHealthMilestonesTemplateIcons()}
               {this.renderCustomHealthMilestones()}
             </View>
