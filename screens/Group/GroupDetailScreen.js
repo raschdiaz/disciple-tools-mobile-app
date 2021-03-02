@@ -1429,55 +1429,62 @@ class GroupDetailScreen extends React.Component {
 
   onRefresh(groupId, forceRefresh = false) {
     if (!self.state.loading || forceRefresh) {
-      fetch('https://demo.myarrow.app/wp-json/dt-public/dt-core/v1/settings', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
+      this.setState(
+        {
+          iconQuantity: 0,
         },
-      })
-        .then(async (response) => {
-          return response.text().then((responseJSON) => {
-            return JSON.parse(responseJSON);
-          });
-        })
-        .then((response) => {
-          console.log('response ', response);
+        () => {
+          fetch('https://demo.myarrow.app/wp-json/dt-public/dt-core/v1/settings', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          })
+            .then(async (response) => {
+              return response.text().then((responseJSON) => {
+                return JSON.parse(responseJSON);
+              });
+            })
+            .then((response) => {
+              console.log('response ', response);
 
-          this.state.progressCircleFromWeb = [];
+              this.state.progressCircleFromWeb = [];
 
-          if (response.health_metrics) {
-            this.state.iconQuantity = Object.keys(response.health_metrics.default).length;
+              if (response.health_metrics) {
+                this.state.iconQuantity = Object.keys(response.health_metrics.default).length;
 
-            console.log(
-              'Object.keys(response.health_metrics.default).length ',
-              Object.keys(response.health_metrics.default).length,
-            );
+                console.log(
+                  'Object.keys(response.health_metrics.default).length ',
+                  Object.keys(response.health_metrics.default).length,
+                );
 
-            var keys = Object.keys(response.health_metrics.default);
+                var keys = Object.keys(response.health_metrics.default);
 
-            keys.forEach((element) => {
-              var object = response.health_metrics.default[element];
-              object.key = element;
+                keys.forEach((element) => {
+                  var object = response.health_metrics.default[element];
+                  object.key = element;
 
-              if (object.image) {
-                if (object.image.includes('dt-assets')) {
-                  object.image = response.health_metrics.url_image_default + object.image;
-                } else {
-                  object.image = response.health_metrics.url_image_custom + object.image;
-                }
+                  if (object.image) {
+                    if (object.image.includes('dt-assets')) {
+                      object.image = response.health_metrics.url_image_default + object.image;
+                    } else {
+                      object.image = response.health_metrics.url_image_custom + object.image;
+                    }
+                  }
+
+                  this.state.progressCircleFromWeb.push(object);
+                });
+
+                console.log('this.state.progressCircleFromWeb ', this.state.progressCircleFromWeb);
               }
 
-              this.state.progressCircleFromWeb.push(object);
+              return {
+                status: 200,
+                data: response,
+              };
             });
-
-            console.log('this.state.progressCircleFromWeb ', this.state.progressCircleFromWeb);
-          }
-
-          return {
-            status: 200,
-            data: response,
-          };
-        });
+        },
+      );
 
       self.getGroupById(groupId);
       self.onRefreshCommentsActivities(groupId, true);

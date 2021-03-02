@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
   },
   welcomeImage: {
     height: 60,
-    width: 250,
+    width: 150,
     resizeMode: 'contain',
     padding: 20,
   },
@@ -931,7 +931,10 @@ class LoginScreen extends React.Component {
           keyboardShouldPersistTaps={'always'}>
           <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps={'always'}>
             <View style={styles.header}>
-              <Image source={require('../assets/images/dt-icon.png')} style={styles.welcomeImage} />
+              <Image
+                source={require('../assets/images/arrow-icon.png')}
+                style={styles.welcomeImage}
+              />
             </View>
             <View style={styles.formContainer}>
               {this.state.mobileAppRequired ? (
