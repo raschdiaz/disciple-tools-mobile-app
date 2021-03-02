@@ -15,7 +15,7 @@ export function* getAll({ domain, token, filter }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `http://${domain}/wp-json/dt-posts/v2/groups${sharedTools.recursivelyMapFilterOnQueryParams(
+      url: `https://${domain}/wp-json/dt-posts/v2/groups${sharedTools.recursivelyMapFilterOnQueryParams(
         newFilter,
         '',
         '',
@@ -87,7 +87,7 @@ export function* saveGroup({ domain, token, groupData }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `http://${domain}/wp-json/dt-posts/v2/groups/${groupId}`,
+      url: `https://${domain}/wp-json/dt-posts/v2/groups/${groupId}`,
       data: {
         method: 'POST',
         headers: {
@@ -169,7 +169,7 @@ export function* getById({ domain, token, groupId }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `http://${domain}/wp-json/dt-posts/v2/groups/${groupId}`,
+      url: `https://${domain}/wp-json/dt-posts/v2/groups/${groupId}`,
       data: {
         method: 'GET',
         headers: {
@@ -217,7 +217,7 @@ export function* getCommentsByGroup({ domain, token, groupId, pagination }) {
     yield put({
       type: 'REQUEST',
       payload: {
-        url: `http://${domain}/wp-json/dt-posts/v2/groups/${groupId}/comments?number=${pagination.limit}&offset=${pagination.offset}`,
+        url: `https://${domain}/wp-json/dt-posts/v2/groups/${groupId}/comments?number=${pagination.limit}&offset=${pagination.offset}`,
         data: {
           method: 'GET',
           headers: {
@@ -269,7 +269,7 @@ export function* saveComment({ domain, token, groupId, commentData }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `http://${domain}/wp-json/dt-posts/v2/groups/${groupId}/comments/${
+      url: `https://${domain}/wp-json/dt-posts/v2/groups/${groupId}/comments/${
         commentData.ID ? commentData.ID : ''
       }`,
       data: {
@@ -339,7 +339,7 @@ export function* getLocations({ domain, token }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `http://${domain}/wp-json/dt-mobile-app/v1/locations`,
+      url: `https://${domain}/wp-json/dt-mobile-app/v1/locations`,
       data: {
         method: 'GET',
         headers: {
@@ -386,7 +386,7 @@ export function* getPeopleGroups({ domain, token }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `http://${domain}/wp-json/dt/v1/people-groups/compact`,
+      url: `https://${domain}/wp-json/dt/v1/people-groups/compact`,
       data: {
         method: 'GET',
         headers: {
@@ -433,7 +433,7 @@ export function* getActivitiesByGroup({ domain, token, groupId, pagination }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `http://${domain}/wp-json/dt-posts/v2/groups/${groupId}/activity?number=${pagination.limit}&offset=${pagination.offset}`,
+      url: `https://${domain}/wp-json/dt-posts/v2/groups/${groupId}/activity?number=${pagination.limit}&offset=${pagination.offset}`,
       data: {
         method: 'GET',
         headers: {
@@ -485,7 +485,7 @@ export function* getSettings({ domain, token }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `http://${domain}/wp-json/dt-posts/v2/groups/settings`,
+      url: `https://${domain}/wp-json/dt-posts/v2/groups/settings`,
       data: {
         method: 'GET',
         headers: {
@@ -531,7 +531,7 @@ export function* searchLocations({ domain, token, queryText }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `http://${domain}/wp-json/dt/v1/mapping_module/search_location_grid_by_name?s=${queryText}&filter=focus`,
+      url: `https://${domain}/wp-json/dt/v1/mapping_module/search_location_grid_by_name?s=${queryText}&filter=focus`,
       data: {
         method: 'GET',
         headers: {
@@ -578,7 +578,7 @@ export function* getLocationListLastModifiedDate({ domain, token }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `http://${domain}/wp-json/dt-mobile-app/v1/location-data`,
+      url: `https://${domain}/wp-json/dt-mobile-app/v1/location-data`,
       data: {
         method: 'GET',
         headers: {
@@ -626,7 +626,7 @@ export function* deleteComment({ domain, token, groupId, commentId }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `http://${domain}/wp-json/dt-posts/v2/groups/${groupId}/comments/${commentId}`,
+      url: `https://${domain}/wp-json/dt-posts/v2/groups/${groupId}/comments/${commentId}`,
       data: {
         method: 'DELETE',
         headers: {
@@ -685,7 +685,7 @@ export function* getShareSettings({ domain, token, groupId }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `http://${domain}/wp-json/dt-posts/v2/groups/${groupId}/shares`,
+      url: `https://${domain}/wp-json/dt-posts/v2/groups/${groupId}/shares`,
       data: {
         method: 'GET',
         headers: {
@@ -736,7 +736,7 @@ export function* addUserToShare({ domain, token, groupId, userId }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `http://${domain}/wp-json/dt-posts/v2/groups/${groupId}/shares`,
+      url: `https://${domain}/wp-json/dt-posts/v2/groups/${groupId}/shares`,
       data: {
         method: 'POST',
         headers: {
@@ -797,7 +797,7 @@ export function* removeSharedUser({ domain, token, groupId, userId }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `http://${domain}/wp-json/dt-posts/v2/groups/${groupId}/shares`,
+      url: `https://${domain}/wp-json/dt-posts/v2/groups/${groupId}/shares`,
       data: {
         method: 'DELETE',
         headers: {

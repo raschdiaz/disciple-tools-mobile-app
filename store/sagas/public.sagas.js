@@ -6,7 +6,7 @@ export function* getSiteSettings({ domain }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `http://${domain}/wp-json/dt-public/dt-core/v1/settings`,
+      url: `https://${domain}/wp-json/dt-public/dt-core/v1/settings`,
       data: {
         method: 'GET',
         headers: {

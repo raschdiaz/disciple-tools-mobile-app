@@ -7,7 +7,7 @@ export function* getActiveQuestionnaires({ domain, token }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `http://${domain}/wp-json/dt-questionnaire/v1/questionnaires`,
+      url: `https://${domain}/wp-json/dt-questionnaire/v1/questionnaires`,
       data: {
         method: 'GET',
         headers: {
@@ -56,7 +56,7 @@ export function* getQuestionnaireById({ domain, token, id }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `http://${domain}/wp-json/dt-questionnaire/v1/questionnaires/${id}`,
+      url: `https://${domain}/wp-json/dt-questionnaire/v1/questionnaires/${id}`,
       data: {
         method: 'GET',
         headers: {
@@ -105,7 +105,7 @@ export function* submitQuestionnaire({ domain, token, questionnaire }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `http://${domain}/wp-json/dt-questionnaire/v1/submit`,
+      url: `https://${domain}/wp-json/dt-questionnaire/v1/submit`,
       data: {
         method: 'POST',
         headers: {

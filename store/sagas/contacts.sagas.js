@@ -15,7 +15,7 @@ export function* getAll({ domain, token, filter }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `http://${domain}/wp-json/dt-posts/v2/contacts${sharedTools.recursivelyMapFilterOnQueryParams(
+      url: `https://${domain}/wp-json/dt-posts/v2/contacts${sharedTools.recursivelyMapFilterOnQueryParams(
         newFilter,
         '',
         '',
@@ -97,7 +97,7 @@ export function* save({ domain, token, contactData }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `http://${domain}/wp-json/dt-posts/v2/contacts/${contactId}`,
+      url: `https://${domain}/wp-json/dt-posts/v2/contacts/${contactId}`,
       data: {
         method: 'POST',
         headers: {
@@ -177,7 +177,7 @@ export function* getById({ domain, token, contactId }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `http://${domain}/wp-json/dt-posts/v2/contacts/${contactId}`,
+      url: `https://${domain}/wp-json/dt-posts/v2/contacts/${contactId}`,
       data: {
         method: 'GET',
         headers: {
@@ -225,7 +225,7 @@ export function* saveComment({ domain, token, contactId, commentData }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `http://${domain}/wp-json/dt-posts/v2/contacts/${contactId}/comments/${
+      url: `https://${domain}/wp-json/dt-posts/v2/contacts/${contactId}/comments/${
         commentData.ID ? commentData.ID : ''
       }`,
       data: {
@@ -296,7 +296,7 @@ export function* getCommentsByContact({ domain, token, contactId, pagination }) 
     yield put({
       type: 'REQUEST',
       payload: {
-        url: `http://${domain}/wp-json/dt-posts/v2/contacts/${contactId}/comments?number=${pagination.limit}&offset=${pagination.offset}`,
+        url: `https://${domain}/wp-json/dt-posts/v2/contacts/${contactId}/comments?number=${pagination.limit}&offset=${pagination.offset}`,
         data: {
           method: 'GET',
           headers: {
@@ -352,7 +352,7 @@ export function* getActivitiesByContact({ domain, token, contactId, pagination }
     yield put({
       type: 'REQUEST',
       payload: {
-        url: `http://${domain}/wp-json/dt-posts/v2/contacts/${contactId}/activity?number=${pagination.limit}&offset=${pagination.offset}`,
+        url: `https://${domain}/wp-json/dt-posts/v2/contacts/${contactId}/activity?number=${pagination.limit}&offset=${pagination.offset}`,
         data: {
           method: 'GET',
           headers: {
@@ -404,7 +404,7 @@ export function* getSettings({ domain, token }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `http://${domain}/wp-json/dt-posts/v2/contacts/settings`,
+      url: `https://${domain}/wp-json/dt-posts/v2/contacts/settings`,
       data: {
         method: 'GET',
         headers: {
@@ -453,7 +453,7 @@ export function* deleteComment({ domain, token, contactId, commentId }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `http://${domain}/wp-json/dt-posts/v2/contacts/${contactId}/comments/${commentId}`,
+      url: `https://${domain}/wp-json/dt-posts/v2/contacts/${contactId}/comments/${commentId}`,
       data: {
         method: 'DELETE',
         headers: {
@@ -512,7 +512,7 @@ export function* getShareSettings({ domain, token, contactId }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `http://${domain}/wp-json/dt-posts/v2/contacts/${contactId}/shares`,
+      url: `https://${domain}/wp-json/dt-posts/v2/contacts/${contactId}/shares`,
       data: {
         method: 'GET',
         headers: {
@@ -563,7 +563,7 @@ export function* addUserToShare({ domain, token, contactId, userId }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `http://${domain}/wp-json/dt-posts/v2/contacts/${contactId}/shares`,
+      url: `https://${domain}/wp-json/dt-posts/v2/contacts/${contactId}/shares`,
       data: {
         method: 'POST',
         headers: {
@@ -624,7 +624,7 @@ export function* removeSharedUser({ domain, token, contactId, userId }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `http://${domain}/wp-json/dt-posts/v2/contacts/${contactId}/shares`,
+      url: `https://${domain}/wp-json/dt-posts/v2/contacts/${contactId}/shares`,
       data: {
         method: 'DELETE',
         headers: {
@@ -684,7 +684,7 @@ export function* getTags({ domain, token }) {
   yield put({
     type: 'REQUEST',
     payload: {
-      url: `http://${domain}/wp-json/dt-posts/v2/contacts/multi-select-values?field=tags`,
+      url: `https://${domain}/wp-json/dt-posts/v2/contacts/multi-select-values?field=tags`,
       data: {
         method: 'GET',
         headers: {
