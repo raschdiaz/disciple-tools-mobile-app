@@ -90,7 +90,7 @@ export default function userReducer(state = initialState, action) {
     case publicActions.PUBLIC_GET_O365_TOKEN_SUCCESS: {
       let { o365Token } = action;
       let userProfileInfo = sharedTools.decodeO365Token(o365Token.access_token);
-      if (newState.userData.username !== userProfileInfo.email) {
+      if (newState.userData.username !== userProfileInfo.upn) {
         state = {
           ...state,
           pinCode: {
@@ -104,10 +104,10 @@ export default function userReducer(state = initialState, action) {
         userData: {
           ...newState.userData,
           token: o365Token.access_token,
-          username: userProfileInfo.email,
+          username: userProfileInfo.upn,
           password: '',
           displayName: userProfileInfo.name,
-          email: userProfileInfo.email,
+          email: userProfileInfo.upn,
           locale: null,
           id: null,
         },
