@@ -491,21 +491,9 @@ class LoginScreen extends React.Component {
                 this.props.siteSettings.login_settings &&
                 this.props.siteSettings.login_settings.microsoft
               ) {
-                this.setState(
-                  (prevState) => (
-                    {
-                      o365Credentials: {
-                        ...prevState.o365Credentials,
-                        ...this.props.siteSettings.login_settings.microsoft,
-                      },
-                    },
-                    () => {
-                      this.setState({
-                        showO365View: true,
-                      });
-                    }
-                  ),
-                );
+                this.setState({
+                  showO365View: true,
+                });
               }
             } else {
               this.props.loginDispatch(
@@ -574,7 +562,10 @@ class LoginScreen extends React.Component {
     } = this.state;
 
     // User logged successfully
-    if (userData && userData.token && prevProps.userData.token !== userData.token) {
+    if (
+      (userData && userData.token && prevProps.userData.token !== userData.token) ||
+      (o365Token && prevProps.o365Token !== o365Token && Object.keys(o365Token).length > 0)
+    ) {
       this.getDataLists();
       this.getUserInfo();
     }
@@ -624,14 +615,6 @@ class LoginScreen extends React.Component {
       listsLastUpdate = new Date(listsLastUpdate).toISOString();
       ExpoFileSystemStorage.setItem('listsLastUpdate', listsLastUpdate);
       this.props.navigation.navigate('ContactList');
-    }
-
-    if (o365Token && prevProps.o365Token !== o365Token && Object.keys(o365Token).length > 0) {
-      console.log('o365Token');
-      console.log(o365Token);
-      let decodedToken = sharedTools.decodeO365Token(o365Token.access_token);
-      console.log('decodedToken');
-      console.log(decodedToken);
     }
 
     const userError = prevProps.userReducerError !== userReducerError && userReducerError;

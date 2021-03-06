@@ -36,7 +36,6 @@ export function* getSiteSettings({ domain }) {
       });
     }
   } catch (error) {
-    console.log(error);
     yield put({
       type: actions.CONTACTS_GETALL_FAILURE,
       error: {
@@ -83,7 +82,6 @@ export function* getSO365Token({ url, params }) {
       });
     }
   } catch (error) {
-    console.log(error);
     yield put({
       type: actions.CONTACTS_GETALL_FAILURE,
       error: {
