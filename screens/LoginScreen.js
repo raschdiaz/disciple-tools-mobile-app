@@ -647,20 +647,21 @@ class LoginScreen extends React.Component {
           break;
         }
       }
-
-      toastError.show(
-        <View>
-          <Text style={{ fontWeight: 'bold', color: Colors.errorText }}>
-            {i18n.t('global.error.code')}
-          </Text>
-          <Text style={{ color: Colors.errorText }}>{error.code}</Text>
-          <Text style={{ fontWeight: 'bold', color: Colors.errorText }}>
-            {i18n.t('global.error.message')}
-          </Text>
-          <Text style={{ color: Colors.errorText }}>{errorMessage}</Text>
-        </View>,
-        3000,
-      );
+      if (toastError) {
+        toastError.show(
+          <View>
+            <Text style={{ fontWeight: 'bold', color: Colors.errorText }}>
+              {i18n.t('global.error.code')}
+            </Text>
+            <Text style={{ color: Colors.errorText }}>{error.code}</Text>
+            <Text style={{ fontWeight: 'bold', color: Colors.errorText }}>
+              {i18n.t('global.error.message')}
+            </Text>
+            <Text style={{ color: Colors.errorText }}>{errorMessage}</Text>
+          </View>,
+          3000,
+        );
+      }
     }
   }
 

@@ -25,6 +25,7 @@ export function* getSiteSettings({ domain }) {
       yield put({
         type: actions.PUBLIC_GET_SITE_SETTINGS_SUCCESS,
         settings: jsonData,
+        domain,
       });
     } else {
       yield put({
