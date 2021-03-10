@@ -300,6 +300,7 @@ class LoginScreen extends React.Component {
       publicReducerLoading,
       siteSettings,
       publicReducerError,
+      usersReducerLoading,
     } = nextProps;
     let newState = {
       ...prevState,
@@ -308,10 +309,10 @@ class LoginScreen extends React.Component {
         userReducerLoading ||
         groupsReducerLoading ||
         contactsReducerLoading ||
-        publicReducerLoading,
+        publicReducerLoading ||
+        usersReducerLoading,
       geonamesLength,
     };
-
     if (userData.token) {
       if (contactSettings) {
         newState = {
@@ -1320,26 +1321,26 @@ const mapStateToProps = (state) => ({
   userReducerLoading: state.userReducer.loading,
   userReducerError: state.userReducer.error,
   rememberPassword: state.userReducer.rememberPassword,
+  pinCode: state.userReducer.pinCode,
   groupsReducerLoading: state.groupsReducer.loading,
   geonames: state.groupsReducer.geonames,
   peopleGroups: state.groupsReducer.peopleGroups,
   groupSettings: state.groupsReducer.settings,
   groupsReducerError: state.groupsReducer.error,
   groups: state.groupsReducer.groups,
+  geonamesLastModifiedDate: state.groupsReducer.geonamesLastModifiedDate,
+  geonamesLength: state.groupsReducer.geonamesLength,
   usersReducerLoading: state.usersReducer.loading,
   users: state.usersReducer.users,
   usersReducerError: state.usersReducer.error,
+  contactFilters: state.usersReducer.contactFilters,
+  groupFilters: state.usersReducer.groupFilters,
   i18n: state.i18nReducer,
   isConnected: state.networkConnectivityReducer.isConnected,
   contactSettings: state.contactsReducer.settings,
   contactsReducerLoading: state.contactsReducer.loading,
   contactsReducerError: state.contactsReducer.error,
   contacts: state.contactsReducer.contacts,
-  pinCode: state.userReducer.pinCode,
-  geonamesLastModifiedDate: state.groupsReducer.geonamesLastModifiedDate,
-  geonamesLength: state.groupsReducer.geonamesLength,
-  contactFilters: state.usersReducer.contactFilters,
-  groupFilters: state.usersReducer.groupFilters,
   notificationsCount: state.notificationsReducer.notificationsCount,
   tags: state.contactsReducer.tags,
   siteSettings: state.publicReducer.settings,
